@@ -43,4 +43,39 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
+
+
+
+    public function company()
+    {
+        return $this->hasOne(Company::class);
+    }
+
+    public function document()
+    {
+        return $this->hasOne(Document::class);
+    }
+
+    public function description()
+    {
+        return $this->hasOne(Description::class);
+    }
+
+    public function phone()
+    {
+        return $this->hasOne(Phone::class);
+    }
+
+    public function categories() // un usuario puede pertenecer a varias categorias
+    {
+        return $this->belongsToMany(Category::class, 'category_user')->withTimestamps();
+    }
+
+    public function services() // un usuario tiene varios servicios 
+    {
+        return $this->hasMany(Service::class);
+    }
+    
 }
