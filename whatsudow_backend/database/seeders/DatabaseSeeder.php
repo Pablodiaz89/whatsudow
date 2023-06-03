@@ -3,6 +3,16 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
+use App\Models\Phone;
+use App\Models\Budget;
+use App\Models\Company;
+use App\Models\Message;
+use App\Models\Service;
+use App\Models\Category;
+use App\Models\Document;
+use App\Models\Location;
+use App\Models\Description;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -20,13 +30,16 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         // factories
-        \App\Models\User::factory()->create();
-        \App\Models\Company::factory()->create();
-        \App\Models\Document::factory()->create();
-        \App\Models\Description::factory()->create();
-        \App\Models\Phone::factory()->create();
-        \App\Models\Category::factory()->create();
-        \App\Models\Service::factory()->create();
+        User::factory()->create();
+        Company::factory()->create();
+        Document::factory()->create();
+        Description::factory()->create();
+        Phone::factory()->create();
+        Category::factory()->create();
+        Service::factory()->create();
+        Location::factory()->create();
+        Budget::factory()->create();
+        Message::factory()->create();
 
         // seeders
         $this->call(RoleSeeder::class);

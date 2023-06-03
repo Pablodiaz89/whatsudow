@@ -4,8 +4,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\BudgetController;
+use App\Http\Controllers\Api\V1\MessageController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\LocationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,3 +56,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::put('/v1/profile/{userId}/document', [UserController::class, 'updateDocument'])->name('profile.updateDocument')->middleware('auth:sanctum');
     Route::put('/v1/profile/{userId}/description', [UserController::class, 'updateDescription'])->name('profile.updateDescription')->middleware('auth:sanctum');
     Route::delete('/v1/profile/{userId}', [UserController::class, 'deleteAccount'])->name('profile.deleteAccount')->middleware('auth:sanctum'); // funciona
+
+ // Localidades
+    Route::get('/locations', [LocationController::class, 'index'])->name('locations.index')->middleware('auth:sanctum');
+
+// Presupuestos (mensajes)
+    Route::get('/v1/budgets', [BudgetController::class, 'index'])->name('budgets.index')->middleware('auth:sanctum');
+    Route::post('/v1/budgets', [BudgetController::class, 'store'])->name('budgets.store')->middleware('auth:sanctum');
+    Route::get('/v1/budgets/{id}', [BudgetController::class, 'show'])->name('budgets.show')->middleware('auth:sanctum');
+    Route::put('/v1/budgets/{id}', [BudgetController::class, 'update'])->name('budgets.update')->middleware('auth:sanctum');
+    Route::delete('/v1/budgets/{id}', [BudgetController::class, 'destroy'])->name('budgets.destroy')->middleware('auth:sanctum');
+
+// Controlador de mensajes (leído o no)
+    Route::put('/v1/messages/{id}/read', [MessageController::class, 'markAsRead'])->name('messages.markAsRead')->middleware('auth:sanctum'); // mensaje leíedo
+    Route::get('/v1/messages/{id}/read', [BudgetController::class, 'getReadStatus'])->name('messages.getReadStatus')->middleware('auth:sanctum'); // estado de lectura

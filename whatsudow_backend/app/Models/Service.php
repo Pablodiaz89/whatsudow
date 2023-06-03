@@ -19,4 +19,9 @@ class Service extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function locations()
+    {
+        return $this->belongsToMany(Location::class, 'location_service')->withTimestamps();
+    }
 }

@@ -19,11 +19,8 @@ return new class extends Migration
 
             $table->timestamps();
         });
-
         
-
-        
-        Schema::create('category_user', function (Blueprint $table) {    // creción de la tabla intermedia categorias-usuarios
+        Schema::create('category_user', function (Blueprint $table) {    // tabla pivote categorias-usuarios
            
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
@@ -33,6 +30,7 @@ return new class extends Migration
 
             $table->timestamps();
         });
+        
     }
 
     /**

@@ -25,7 +25,7 @@ class ServiceController extends Controller
      */
     public function store(ServiceResquest $request)
     {
-        // obtener el usuario autenticado
+        // obtención del usuario autenticado
         $user = Auth::user();
         
         // crear el servicio
