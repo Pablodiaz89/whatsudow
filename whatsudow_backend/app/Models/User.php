@@ -87,4 +87,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Location::class);
     }
+
+    public function availabilities()
+    {
+        return $this->hasMany(Availability::class);
+    }
 }
