@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('addresse_id');
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('title');
-            $table->date('event_date');
+            $table->date('event_date')->format('d-m-Y');
             $table->unsignedBigInteger('location_id');
             $table->text('description');
             $table->text('message');

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Phone;
 use App\Models\Budget;
+use App\Models\Message;
+use App\Models\Location;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Location;
-use App\Models\Message;
 use Illuminate\Support\Facades\Auth;
 
 class BudgetController extends Controller
@@ -18,8 +19,11 @@ class BudgetController extends Controller
      */
     public function index()
     {
-        $budgets = Budget::all();
-
+        $budgets = Budget::all()->map(function ($budget) {
+            $budget->event_date = Carbon::parse($budget->event_date)->format('d-m-Y');
+            return $budget;
+        });
+    
         return response()->json($budgets);
     }
 
@@ -67,7 +71,7 @@ class BudgetController extends Controller
             'sender_telefono' => $senderPhone,
             'addresse_id' => $addressee->id,
             'title' => $request->input('title'),
-            'event_date' => $request->input('event_date'),
+            'event_date' => Carbon::parse($request->input('event_date'))->format('d-m-Y'),
             'location_id' => $location->id,
             'description' => $request->input('description'),
             'message' => $request->input('message'),
@@ -90,12 +94,35 @@ class BudgetController extends Controller
     {
         $message = Message::findOrFail($id);
 
-        // verificacion si el usuario autenticado es el remitente del mensaje
-        if ($message->sender_id !== Auth::id()) {
+        // verificacion si el usuario autenticado es el remitente o destinatario del mensaje
+        if ($message->sender_id !== Auth::id() && $message->addresse_id !== Auth::id()) {
             return response()->json(['message' => 'No autorizado'], 401);
         }
 
-        return response()->json($message);
+        // obtención del título de la solicitud de presupuesto
+        $budgetTitle = $message->title;
+
+        // obtencion del nombre de usuario del emisor del mensaje
+        $senderName = $message->sender_name;
+
+        // obtencion de la fecha de recepción del mensaje
+        $receivedDate = $message->created_at->format('d-m-Y');
+
+        // estado del mensaje
+        $status = $message->reply_sent ? 'Enviado' : 'Sin responder';
+
+        // obtencion de la fecha de envío en caso de que el mensaje haya sido enviado
+        $sentDate = $message->reply_sent ? $message->updated_at->format('d-m-Y') : null;
+
+        // Pasar los datos a la vista
+        return response()->json([
+            'budget_title' => $budgetTitle,
+            'sender_name' => $senderName,
+            'received_date' => $receivedDate,
+            'status' => $status,
+            'sent_date' => $sentDate,
+            'message' => $message,
+        ]);
     }
 
     /**

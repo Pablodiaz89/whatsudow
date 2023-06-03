@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('user_id');
             $table->string('title');
-            $table->date('event_date');
+            $table->date('event_date')->format('d-m-Y');
             $table->unsignedBigInteger('location_id');
             $table->text('description');
             $table->timestamps();
