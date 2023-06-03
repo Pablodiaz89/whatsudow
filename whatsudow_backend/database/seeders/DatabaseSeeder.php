@@ -13,6 +13,7 @@ use App\Models\Category;
 use App\Models\Document;
 use App\Models\Location;
 use App\Models\Description;
+use App\Models\Favorite;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -40,6 +41,7 @@ class DatabaseSeeder extends Seeder
         Location::factory()->create();
         Budget::factory()->create();
         Message::factory()->create();
+        Favorite::factory()->create();
 
         // seeders
         $this->call(RoleSeeder::class);

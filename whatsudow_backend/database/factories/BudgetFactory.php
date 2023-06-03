@@ -2,8 +2,6 @@
 
 namespace Database\Factories;
 
-
-
 use App\Models\Budget;
 use App\Models\User;
 use App\Models\Location;
