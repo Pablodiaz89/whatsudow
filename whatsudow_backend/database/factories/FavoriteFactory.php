@@ -2,16 +2,16 @@
 
 namespace Database\Factories;
 
-use App\Models\Document;
 use App\Models\User;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Document>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Favorite>
  */
-class DocumentFactory extends Factory
+class FavoriteFactory extends Factory
 {
-    protected $model = Document::class;
+    protected $model = Favorite::class;
 
     /**
      * Define the model's default state.
@@ -20,9 +20,10 @@ class DocumentFactory extends Factory
      */
     public function definition(): array
     {
+        
         return [
             'user_id' => User::factory(),
-            'document_indetification' => fake()->unique()->randomNumber(8),
+            'service_id' => Service::factory(),
         ];
     }
 }

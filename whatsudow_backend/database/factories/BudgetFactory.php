@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class BudgetFactory extends Factory
 {
     protected $model = Budget::class;
+    
     /**
      * Define the model's default state.
      *

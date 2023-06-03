@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Phone;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -10,6 +11,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PhoneFactory extends Factory
 {
+
+    protected $model = Phone::class;
+
     /**
      * Define the model's default state.
      *

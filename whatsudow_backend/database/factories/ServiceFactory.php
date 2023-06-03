@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ServiceFactory extends Factory
 {
+    protected $model = Service::class;
+    
     /**
      * Define the model's default state.
      *

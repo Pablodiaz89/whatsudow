@@ -69,4 +69,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Controlador de mensajes (leído o no)
     Route::put('/v1/messages/{id}/read', [MessageController::class, 'markAsRead'])->name('messages.markAsRead')->middleware('auth:sanctum'); // mensaje leíedo
-    Route::get('/v1/messages/{id}/read', [BudgetController::class, 'getReadStatus'])->name('messages.getReadStatus')->middleware('auth:sanctum'); // estado de lectura
+    Route::get('/v1/messages/{id}/read', [MessageController::class, 'getReadStatus'])->name('messages.getReadStatus')->middleware('auth:sanctum'); // estado de lectura
+
+ // Favoritos
+    Route::post('/v1/favorites', [FavoriteController::class, 'addFavorite'])->name('favorites.add')->middleware('auth:sanctum');
+    Route::delete('/v1/favorites', [FavoriteController::class, 'removeAllFavorites'])->name('favorites.remove_all')->middleware('auth:sanctum');
+    Route::delete('/v1/favorites/{favoriteId}', [FavoriteController::class, 'removeSingleFavorite'])->name('favorites.remove')->middleware('auth:sanctum');
+    Route::get('/v1/favorites', [FavoriteController::class, 'getFavorites'])->name('favorites.get')->middleware('auth:sanctum');
