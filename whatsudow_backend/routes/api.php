@@ -78,9 +78,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/v1/favorites', [FavoriteController::class, 'getFavorites'])->name('favorites.get')->middleware('auth:sanctum');
 
 // Calendario
-Route::get('/v1/availabilities', [AvailabiltyController::class, 'index'])->name('availabilities.index')->middleware('auth:sanctum');
-Route::post('/v1/availabilities', [AvailabiltyController::class, 'store'])->name('availabilities.store')->middleware('auth:sanctum');
-Route::get('/v1/availabilities/{id}', [AvailabiltyController::class, 'show'])->name('availabilities.show')->middleware('auth:sanctum');
-Route::put('/v1/availabilities/{id}', [AvailabiltyController::class, 'update'])->name('availabilities.update')->middleware('auth:sanctum');
-Route::delete('/v1/availabilities/{id}', [AvailabiltyController::class, 'destroy'])->name('availabilities.destroy')->middleware('auth:sanctum');
-Route::get('/v1/availability-events', [AvailabiltyController::class, 'getEvents'])->name('availabilities.getEvents')->middleware('auth:sanctum');   
+    Route::get('/v1/availabilities', [AvailabiltyController::class, 'index'])->name('availabilities.index')->middleware('auth:sanctum');
+    Route::post('/v1/availabilities', [AvailabiltyController::class, 'store'])->name('availabilities.store')->middleware('auth:sanctum');
+    Route::get('/v1/availabilities/{id}', [AvailabiltyController::class, 'show'])->name('availabilities.show')->middleware('auth:sanctum');
+    Route::put('/v1/availabilities/{id}', [AvailabiltyController::class, 'update'])->name('availabilities.update')->middleware('auth:sanctum');
+    Route::delete('/v1/availabilities/{id}', [AvailabiltyController::class, 'destroy'])->name('availabilities.destroy')->middleware('auth:sanctum');
+    Route::get('/v1/availability-events', [AvailabiltyController::class, 'getEvents'])->name('availabilities.getEvents')->middleware('auth:sanctum');   
