@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('availabilities', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('title');
             $table->date('start_date');
             $table->date('end_date');
             $table->enum('status', ['disponible', 'pre-reservado', 'no-disponible']);
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

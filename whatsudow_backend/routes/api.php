@@ -5,11 +5,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\ImageController;
 use App\Http\Controllers\Api\V1\BudgetController;
 use App\Http\Controllers\Api\V1\MessageController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\LocationController;
+use App\Http\Controllers\Api\V1\AvailabiltyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,13 +62,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::delete('/v1/profile/{userId}', [UserController::class, 'deleteAccount'])->name('profile.deleteAccount')->middleware('auth:sanctum'); // funciona
 
  // Localidades
-    Route::get('/locations', [LocationController::class, 'index'])->name('locations.index')->middleware('auth:sanctum');
+    Route::get('v1/locations', [LocationController::class, 'index'])->name('locations.index')->middleware('auth:sanctum'); // funciona
 
 // Presupuestos (mensajes)
-    Route::get('/v1/budgets', [BudgetController::class, 'index'])->name('budgets.index')->middleware('auth:sanctum');
+    Route::get('/v1/budgets', [BudgetController::class, 'index'])->name('budgets.index')->middleware('auth:sanctum'); // funciona
     Route::post('/v1/budgets', [BudgetController::class, 'store'])->name('budgets.store')->middleware('auth:sanctum');
-    Route::get('/v1/budgets/{id}', [BudgetController::class, 'show'])->name('budgets.show')->middleware('auth:sanctum');
-    Route::put('/v1/budgets/{id}', [BudgetController::class, 'update'])->name('budgets.update')->middleware('auth:sanctum');
+    Route::get('/v1/budgets/{id}', [BudgetController::class, 'show'])->name('budgets.show')->middleware('auth:sanctum'); // funciona
+    Route::put('/v1/budgets/{id}', [BudgetController::class, 'update'])->name('budgets.update')->middleware('auth:sanctum'); // 
     Route::delete('/v1/budgets/{id}', [BudgetController::class, 'destroy'])->name('budgets.destroy')->middleware('auth:sanctum');
 
 // Controlador de mensajes (leído o no)
@@ -73,10 +76,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/v1/messages/{id}/read', [MessageController::class, 'getReadStatus'])->name('messages.getReadStatus')->middleware('auth:sanctum'); // estado de lectura
 
  // Favoritos
-    Route::post('/v1/favorites', [FavoriteController::class, 'addFavorite'])->name('favorites.add')->middleware('auth:sanctum');
-    Route::delete('/v1/favorites', [FavoriteController::class, 'removeAllFavorites'])->name('favorites.remove_all')->middleware('auth:sanctum');
-    Route::delete('/v1/favorites/{favoriteId}', [FavoriteController::class, 'removeSingleFavorite'])->name('favorites.remove')->middleware('auth:sanctum');
-    Route::get('/v1/favorites', [FavoriteController::class, 'getFavorites'])->name('favorites.get')->middleware('auth:sanctum');
+    Route::post('/v1/favorites', [FavoriteController::class, 'addFavorite'])->name('favorites.add')->middleware('auth:sanctum'); // funciona
+    Route::delete('/v1/favorites', [FavoriteController::class, 'removeAllFavorites'])->name('favorites.remove_all')->middleware('auth:sanctum'); // funciona
+    Route::delete('/v1/favorites/{favoriteId}', [FavoriteController::class, 'removeSingleFavorite'])->name('favorites.remove')->middleware('auth:sanctum'); // funciona
+    Route::get('/v1/favorites', [FavoriteController::class, 'getFavorites'])->name('favorites.get')->middleware('auth:sanctum'); // funciona
 
 // Calendario
     Route::get('/v1/availabilities', [AvailabiltyController::class, 'index'])->name('availabilities.index')->middleware('auth:sanctum');
@@ -86,9 +89,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::delete('/v1/availabilities/{id}', [AvailabiltyController::class, 'destroy'])->name('availabilities.destroy')->middleware('auth:sanctum');
     Route::get('/v1/availability-events', [AvailabiltyController::class, 'getEvents'])->name('availabilities.getEvents')->middleware('auth:sanctum');   
 
+    Route::get('/v1/sync-google-calendar', [AvailabilityController::class, 'syncGoogleCalendar'])->name('sync-google-calendar')->middleware('auth:sanctum');;
+
 // Archivos
     Route::get('/v1/files', [FileController::class, 'index'])->name('files.index')->middleware('auth:sanctum'); // funciona
     Route::post('/v1/files', [FileController::class, 'store'])->name('files.store')->middleware('auth:sanctum'); // mirar como es con imagenes (campo file requerido, pero no soy capaz en postman)
     Route::get('/v1/files/{id}', [FileController::class, 'show'])->name('files.show')->middleware('auth:sanctum'); // funciona
     Route::put('/v1/files/{id}', [FileController::class, 'update'])->name('files.update')->middleware('auth:sanctum'); // mirar como es con imagenes (campo file requerido, pero no soy capaz en postman)
     Route::delete('/v1/files/{id}', [FileController::class, 'destroy'])->name('files.destroy')->middleware('auth:sanctum'); // funciona
+
+// Imagenes
+    Route::get('/v1/images', [ImageController::class, 'index'])->name('images.index')->middleware('auth:sanctum');
+    Route::get('/v1/images/{id}', [ImageController::class, 'show'])->name('images.show')->middleware('auth:sanctum');
+    Route::post('/v1/images', [ImageController::class, 'store'])->name('images.store')->middleware('auth:sanctum');
+    Route::put('/v1/images/{id}', [ImageController::class, 'update'])->name('images.update')->middleware('auth:sanctum');
+    Route::delete('/v1/images/{id}', [ImageController::class, 'destroy'])->name('images.destroy')->middleware('auth:sanctum');

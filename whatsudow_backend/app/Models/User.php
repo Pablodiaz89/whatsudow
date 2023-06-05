@@ -92,4 +92,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Availability::class);
     }
+
+    public function files()
+    {
+        return $this->hasMany(File::class);
+    }
 }

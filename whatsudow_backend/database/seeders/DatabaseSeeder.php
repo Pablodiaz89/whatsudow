@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
 use App\Models\File;
 use App\Models\User;
+use App\Models\Image;
 use App\Models\Phone;
 use App\Models\Budget;
 use App\Models\Company;
@@ -15,6 +17,7 @@ use App\Models\Document;
 use App\Models\Favorite;
 use App\Models\Location;
 use App\Models\Description;
+use App\Models\Availability;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -41,10 +44,12 @@ class DatabaseSeeder extends Seeder
         Phone::factory()->create();
         Category::factory()->create();
         Service::factory()->create();
+        Image::factory()->create();
         Location::factory()->create();
         Budget::factory()->create();
         Message::factory()->create();
         Favorite::factory()->create();
+        Availability::factory()->create();
         File::factory()->count(10)->create([
             'user_id' => $user->id,
         ]);

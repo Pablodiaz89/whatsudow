@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Image;
 
 class Service extends Model
 {
@@ -23,5 +24,10 @@ class Service extends Model
     public function locations()
     {
         return $this->belongsToMany(Location::class, 'location_service')->withTimestamps();
+    }
+
+    public function images()
+    {
+        return $this->hasMany(Image::class);
     }
 }

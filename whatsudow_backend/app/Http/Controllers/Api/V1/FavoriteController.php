@@ -59,7 +59,7 @@ class FavoriteController extends Controller
     {
         $userId = Auth::id();
         $favorites = Favorite::where('user_id', $userId)
-        ->with('service.user', 'user.category', 'service.images')
+        ->with('service.user', 'service.images')
         ->get();
 
     return response()->json($favorites);

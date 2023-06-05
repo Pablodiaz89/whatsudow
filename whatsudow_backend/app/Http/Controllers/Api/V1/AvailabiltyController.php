@@ -9,10 +9,47 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Google\Client;
+use Google\Service\Calendar;
+use Google\Service\Calendar\Event;
 use Spatie\Permission\Traits\HasRoles;
 
 class AvailabiltyController extends Controller
 {
+    use HasRoles;
+
+    private $calendarService;
+
+    public function __construct()
+    {
+        // cliente de Google Calendar
+        $client = new Client();
+        $client->setApplicationName('whatsudow');
+        $client->setClientId(env('GOOGLE_CLIENT_ID'));
+        $client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
+        $client->setRedirectUri(env('GOOGLE_REDIRECT_URI'));
+        $client->setAccessType('offline');
+        $client->setApprovalPrompt('force');
+        $client->addScope(Calendar::CALENDAR_EVENTS);
+
+        $this->calendarService = new Calendar($client);
+    }
+
+    public function syncGoogleCalendar()
+    {
+        $client = new Client();
+        $client->setClientId(env('GOOGLE_CLIENT_ID'));
+        $client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
+        $client->setRedirectUri(env('GOOGLE_REDIRECT_URI'));
+        $client->setAccessType('offline');
+        $client->setApprovalPrompt('force');
+        $client->addScope('https://www.googleapis.com/auth/calendar');
+
+        $authUrl = $client->createAuthUrl();
+
+        return redirect()->away($authUrl);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -38,18 +75,35 @@ class AvailabiltyController extends Controller
         ]);
 
         // verificar si es proveedor
-        if (!Auth::user()->hasRole('proveedor')) {
+        if (!$this->hasRole('proveedor')) {
             return response()->json(['message' => 'No tienes permiso para realizar esta acción'], 403);
         }
 
         // crear disponibilidad
         $availability = new Availability();
-        $availability->user_id = Auth::id();
+        $availability->user_id = Auth::user()->id;
         $availability->title = $request->input('title');
         $availability->start_date = $request->input('start_date');
         $availability->end_date = $request->input('end_date');
         $availability->status = $request->input('status');
         $availability->save();
+
+        // crear evento en Google Calendar
+        $event = new Event([
+            'summary' => $availability->title,
+            'start' => [
+                'dateTime' => Carbon::parse($availability->start_date)->toIso8601String(),
+                'timeZone' => 'America/New_York', // Ajusta el timezone según sea necesario
+            ],
+            'end' => [
+                'dateTime' => Carbon::parse($availability->end_date)->toIso8601String(),
+                'timeZone' => 'America/New_York', // Ajusta el timezone según sea necesario
+            ],
+        ]);
+
+        $calendarId = 'primary'; // Puedes ajustar el ID del calendario según tus necesidades
+
+        $event = $this->calendarService->events->insert($calendarId, $event);
 
         return response()->json($availability, 201);
     }
@@ -60,7 +114,7 @@ class AvailabiltyController extends Controller
     public function show(string $id)
     {
         // obtener disponibilidad especifica del proveedor que vemos
-        $availability = Availability::where('user_id', Auth::id())->find($id);
+        $availability = Availability::where('user_id', Auth::user()->id)->find($id);
 
         if (!$availability) {
             return response()->json(['message' => 'No se encontró la disponibilidad'], 404);
@@ -84,17 +138,17 @@ class AvailabiltyController extends Controller
         ]);
 
         // verificación si es proveedor
-        if (!Auth::user()->hasRole('proveedor')) {
+        if (!$this->hasRole('proveedor')) {
             return response()->json(['message' => 'No tienes permiso para realizar esta acción'], 403);
         }
 
         // obtener disponibilidad
-        $availability = Availability::where('user_id', Auth::id())->find($id);
+        $availability = Availability::where('user_id', Auth::user()->id)->find($id);
         if (!$availability) {
             return response()->json(['message' => 'No se encontró la disponibilidad'], 404);
         }
 
-        // abcualizar disponibilidad
+        // actualizar disponibilidad
         $availability->title = $request->input('title');
         $availability->start_date = $request->input('start_date');
         $availability->end_date = $request->input('end_date');
@@ -111,12 +165,12 @@ class AvailabiltyController extends Controller
     public function destroy(string $id) // elimina la disponibilidad del proveedor
     {
         // verificar si es proveedor
-        if (!Auth::user()->hasRole('proveedor')) {
+        if (!$this->hasRole('proveedor')) {
             return response()->json(['message' => 'No tienes permiso para realizar esta acción'], 403);
         }
 
         // verificar disponibilidad y si es proveedor
-        $availability = Availability::where('user_id', Auth::id())->find($id);
+        $availability = Availability::where('user_id', Auth::user()->id)->find($id);
         if (!$availability) {
             return response()->json(['message' => 'No se encontró la disponibilidad'], 404);
         }
@@ -132,7 +186,7 @@ class AvailabiltyController extends Controller
     public function getEvents() // obtiene los eventos de disponibilidad del proveedor
     {
        // verificar si es proveedor o organizador
-       if (Auth::user()->hasAnyRole(['proveedor', 'organizador'])) {
+       if ($this->hasAnyRole(['proveedor', 'organizador'])) {
         
         $providers = Role::where('name', 'proveedor')->first()->users; // obtener proveedor y disponibilidad
 
@@ -153,7 +207,7 @@ class AvailabiltyController extends Controller
                     'start' => $start->toDateTimeString(),
                     'end' => $end->toDateTimeString(),
                     'color' => $color,
-                    'proveedor' => $provider->name, 
+                    'proveedor' => $provider->name,
                 ];
 
                 $events[] = $event;
@@ -162,7 +216,6 @@ class AvailabiltyController extends Controller
 
         return response()->json($events);
         } else {
-            // si no es proveedor o organizador
             return response()->json(['message' => 'No tienes permiso para acceder a esta información'], 403);
         }
     }
