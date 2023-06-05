@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\BudgetController;
 use App\Http\Controllers\Api\V1\MessageController;
@@ -86,4 +87,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/v1/availability-events', [AvailabiltyController::class, 'getEvents'])->name('availabilities.getEvents')->middleware('auth:sanctum');   
 
 // Archivos
-    Route::post('/files', [FileController::class, 'upload'])->middleware('auth:sanctum');
+    Route::get('/v1/files', [FileController::class, 'index'])->name('files.index')->middleware('auth:sanctum'); // funciona
+    Route::post('/v1/files', [FileController::class, 'store'])->name('files.store')->middleware('auth:sanctum'); // mirar como es con imagenes (campo file requerido, pero no soy capaz en postman)
+    Route::get('/v1/files/{id}', [FileController::class, 'show'])->name('files.show')->middleware('auth:sanctum'); // funciona
+    Route::put('/v1/files/{id}', [FileController::class, 'update'])->name('files.update')->middleware('auth:sanctum'); // mirar como es con imagenes (campo file requerido, pero no soy capaz en postman)
+    Route::delete('/v1/files/{id}', [FileController::class, 'destroy'])->name('files.destroy')->middleware('auth:sanctum'); // funciona
