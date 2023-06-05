@@ -36,7 +36,7 @@ return [
             'throw' => false,
         ],
 
-        'public' => [
+        'public' => [ //configuración para guardar archivos
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
