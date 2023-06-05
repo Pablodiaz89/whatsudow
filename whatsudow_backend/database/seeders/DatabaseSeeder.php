@@ -18,6 +18,7 @@ use App\Models\Favorite;
 use App\Models\Location;
 use App\Models\Description;
 use App\Models\Availability;
+use App\Models\Pdf;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -50,6 +51,7 @@ class DatabaseSeeder extends Seeder
         Message::factory()->create();
         Favorite::factory()->create();
         Availability::factory()->create();
+        Pdf::factory()->create();
         File::factory()->count(10)->create([
             'user_id' => $user->id,
         ]);

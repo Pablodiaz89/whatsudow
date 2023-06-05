@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\V1\PdfController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\ImageController;
@@ -104,3 +105,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/v1/images', [ImageController::class, 'store'])->name('images.store')->middleware('auth:sanctum');
     Route::put('/v1/images/{id}', [ImageController::class, 'update'])->name('images.update')->middleware('auth:sanctum');
     Route::delete('/v1/images/{id}', [ImageController::class, 'destroy'])->name('images.destroy')->middleware('auth:sanctum');
+
+    // pdfs
+    Route::post('/v1/pdfs', [PdfController::class, 'store'])->name('pdfs.store')->middleware('auth:sanctum');
+    Route::get('/v1/pdfs/{pdf}', [PdfController::class, 'show'])->name('pdfs.show')->middleware('auth:sanctum');
+    Route::get('/v1/pdfs/{pdf}/download', [PdfController::class, 'download'])->name('pdfs.download')->middleware('auth:sanctum');
+    
