@@ -87,7 +87,7 @@ class UserController extends Controller
     }
 
 
-    // actualizar telefono
+    // actualizar teléfono
     public function updatePhone(Request $request, $userId)
     {
         $user = User::find($userId);
@@ -121,7 +121,7 @@ class UserController extends Controller
         ]);
     
         $company = $user->company;
-    
+
         if (!$company) {
             $company = new Company();
             $company->user_id = $user->id; 
@@ -130,7 +130,7 @@ class UserController extends Controller
         $company->company = $request->input('company');
         $company->save();
     
-        $user->company()->save($company);
+        $user->company()->associate($company);
 
         return response()->json(['message' => 'Empresa actualizada con éxito']);
     }
@@ -152,7 +152,7 @@ class UserController extends Controller
     
         if (!$document) {
             $document = new Document();
-            $document->user_id = $user->id; // Asignar el ID del usuario
+            $document->user_id = $user->id; 
         }
     
         $document->document_identification = $request->input('document');
@@ -173,17 +173,17 @@ class UserController extends Controller
         }
 
         $request->validate([
-            'description' => 'required|string',
+            'description' => 'sometimes|string',
         ]);
     
-        $description = $user->company;
+        $description = $user->description;
     
         if (!$description) {
             $description = new Description();
-            $description->user_id = $user->id; 
+            $description->user_id = $user->id;
         }
     
-        $description->description = $request->input('description');
+        $description->description = $request->input('description', '');
         $description->save();
     
         $user->description()->save($description);

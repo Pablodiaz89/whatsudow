@@ -121,17 +121,21 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         // obtener el usuario autenticado
-    $user = $request->user;
+        $user = $request->user();
 
-    // Revocar todos los tokens de acceso del usuario
-    $user->tokens()->delete();
+        // verificar si el usuario esta autenticado
+        if ($user)
+        {
+            // revocar todos los tokens de acceso del usuario
+            $user->tokens()->delete();
 
-    // Cerrar sesión
-    auth()->logout();
+            // cerrar sesión
+            Auth::guard('web')->logout();
+        }
 
-    return response()->json([
-        'message' => 'Ha cerrado sesión correctamente'
-    ], 200);
+        return response()->json([
+            'message' => 'Ha cerrado sesión correctamente'
+        ], 200);
 
     }
 }

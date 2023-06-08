@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('event_date')->format('d-m-Y');
             $table->unsignedBigInteger('location_id');
             $table->text('description');
+            
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

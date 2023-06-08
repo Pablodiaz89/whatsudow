@@ -27,10 +27,16 @@ class CategoryController extends Controller
         $data = $request->validated();
         
         // crear
-        $service = Category::create($data);
+        $category = Category::create($data);
         
+        /*
+        // asociación del icono a la categoría
+        $category->icono = 'nombre-del-icono.png'; 
+        $category->save(); 
+        */
+
         // respuesta
-        return response()->json($service, 201);
+        return response()->json($category, 201);
     }
 
     /**
@@ -52,6 +58,12 @@ class CategoryController extends Controller
 
         // actualización
         $category->update($data);
+
+        /*
+        // asociación del icono a la categoría
+        $category->icono = 'nombre-del-icono.png'; 
+        $category->save(); 
+        */
 
         // respuesta
         return response()->json($category);

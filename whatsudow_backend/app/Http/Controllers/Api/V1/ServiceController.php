@@ -112,7 +112,6 @@ class ServiceController extends Controller
 
         // desconectar el servicio del usuario
         $user = User::find($service->user_id);
-        $user->services()->detach($service);
 
         // eliminar el servicio
         $service->delete();

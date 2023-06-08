@@ -39,7 +39,7 @@ class BudgetController extends Controller
             'event_date' => 'required|date',
             'location' => 'required|string',
             'description' => 'required',
-            'message' => 'required', 
+            
         ]);
 
         // obtencion de los datos del usuario emisor
@@ -71,10 +71,9 @@ class BudgetController extends Controller
             'sender_telefono' => $senderPhone,
             'addresse_id' => $addressee->id,
             'title' => $request->input('title'),
-            'event_date' => Carbon::parse($request->input('event_date'))->format('d-m-Y'),
+            'event_date' => Carbon::createFromFormat('d-m-Y', $request->input('event_date'))->format('Y-m-d'),
             'location_id' => $location->id,
             'description' => $request->input('description'),
-            'message' => $request->input('message'),
             'read' => false,
         ]);
 
@@ -153,7 +152,7 @@ class BudgetController extends Controller
 
 
 
-    public function reply(Request $request, string $id)
+    public function reply(Request $request, string $id) // mirar esto mejor
     {
         $message = Message::findOrFail($id);
 

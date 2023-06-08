@@ -36,7 +36,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/registerorganizer', [AuthController::class, 'registerorganizer']); // funciona
     Route::post('/login', [AuthController::class, 'login']); // funciona
     Route::post('/infouser', [AuthController::class, 'infouser'])->middleware('auth:sanctum'); // la tengo para comprobar si el usuario esta autenticado
-    Route::get('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+    Route::get('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum'); // funciona
 
 // Servicios
     Route::get('/v1/services', [ServiceController::class, 'index'])->name('services.index')->middleware('auth:sanctum'); // funciona
@@ -55,20 +55,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/v1/profile/{userId}', [UserController::class, 'showProfile'])->name('profile.show')->middleware('auth:sanctum'); // funciona
     Route::put('/v1/profile/{userId}/name', [UserController::class, 'updateName'])->name('profile.updateName')->middleware('auth:sanctum'); // funciona
     Route::put('/v1/profile/{userId}/email', [UserController::class, 'updateEmail'])->name('profile.updateEmail')->middleware('auth:sanctum'); // funciona
-    Route::put('/v1/profile/{userId}/password', [UserController::class, 'updatePassword'])->name('profile.updatePassword')->middleware('auth:sanctum'); // tengo que mirar como hacerlo
-    Route::put('/v1/profile/{userId}/phone', [UserController::class, 'updatePhone'])->name('profile.updatePhone')->middleware('auth:sanctum');
-    Route::put('/v1/profile/{userId}/company', [UserController::class, 'updateCompany'])->name('profile.updateCompany')->middleware('auth:sanctum'); // funciona
-    Route::put('/v1/profile/{userId}/document', [UserController::class, 'updateDocument'])->name('profile.updateDocument')->middleware('auth:sanctum');
-    Route::put('/v1/profile/{userId}/description', [UserController::class, 'updateDescription'])->name('profile.updateDescription')->middleware('auth:sanctum');
+    Route::put('/v1/profile/{userId}/password', [UserController::class, 'updatePassword'])->name('profile.updatePassword')->middleware('auth:sanctum'); // 
+    Route::put('/v1/profile/{userId}/phone', [UserController::class, 'updatePhone'])->name('profile.updatePhone')->middleware('auth:sanctum'); // 
+    Route::put('/v1/profile/{userId}/company', [UserController::class, 'updateCompany'])->name('profile.updateCompany')->middleware('auth:sanctum'); // solo me deja la primera vez
+    Route::put('/v1/profile/{userId}/document', [UserController::class, 'updateDocument'])->name('profile.updateDocument')->middleware('auth:sanctum'); // solo me deja la primera vez
+    Route::put('/v1/profile/{userId}/description', [UserController::class, 'updateDescription'])->name('profile.updateDescription')->middleware('auth:sanctum'); // solo me deja la primera vez
     Route::delete('/v1/profile/{userId}', [UserController::class, 'deleteAccount'])->name('profile.deleteAccount')->middleware('auth:sanctum'); // funciona
 
  // Localidades
     Route::get('v1/locations', [LocationController::class, 'index'])->name('locations.index')->middleware('auth:sanctum'); // funciona
 
 // Presupuestos (mensajes)
-    Route::get('/v1/budgets', [BudgetController::class, 'index'])->name('budgets.index')->middleware('auth:sanctum'); // funciona
+    Route::get('/v1/budgets', [BudgetController::class, 'index'])->name('budgets.index')->middleware('auth:sanctum'); // funciona, pero creo que no hace falta
     Route::post('/v1/budgets', [BudgetController::class, 'store'])->name('budgets.store')->middleware('auth:sanctum');
-    Route::get('/v1/budgets/{id}', [BudgetController::class, 'show'])->name('budgets.show')->middleware('auth:sanctum'); // funciona
+    Route::get('/v1/budgets/{id}', [BudgetController::class, 'show'])->name('budgets.show')->middleware('auth:sanctum'); // 
     Route::put('/v1/budgets/{id}', [BudgetController::class, 'update'])->name('budgets.update')->middleware('auth:sanctum'); // 
     Route::delete('/v1/budgets/{id}', [BudgetController::class, 'destroy'])->name('budgets.destroy')->middleware('auth:sanctum');
 
@@ -77,10 +77,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/v1/messages/{id}/read', [MessageController::class, 'getReadStatus'])->name('messages.getReadStatus')->middleware('auth:sanctum'); // estado de lectura
 
  // Favoritos
-    Route::post('/v1/favorites', [FavoriteController::class, 'addFavorite'])->name('favorites.add')->middleware('auth:sanctum'); // funciona
-    Route::delete('/v1/favorites', [FavoriteController::class, 'removeAllFavorites'])->name('favorites.remove_all')->middleware('auth:sanctum'); // funciona
-    Route::delete('/v1/favorites/{favoriteId}', [FavoriteController::class, 'removeSingleFavorite'])->name('favorites.remove')->middleware('auth:sanctum'); // funciona
-    Route::get('/v1/favorites', [FavoriteController::class, 'getFavorites'])->name('favorites.get')->middleware('auth:sanctum'); // funciona
+    Route::post('/v1/favorites', [FavoriteController::class, 'addFavorite'])->name('favorites.add')->middleware('auth:sanctum'); // 
+    Route::delete('/v1/favorites', [FavoriteController::class, 'removeAllFavorites'])->name('favorites.remove_all')->middleware('auth:sanctum'); // 
+    Route::delete('/v1/favorites/{favoriteId}', [FavoriteController::class, 'removeSingleFavorite'])->name('favorites.remove')->middleware('auth:sanctum'); // 
+    Route::get('/v1/favorites', [FavoriteController::class, 'getFavorites'])->name('favorites.get')->middleware('auth:sanctum'); // 
 
 // Calendario
     Route::get('/v1/availabilities', [AvailabiltyController::class, 'index'])->name('availabilities.index')->middleware('auth:sanctum');
@@ -93,11 +93,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/v1/sync-google-calendar', [AvailabilityController::class, 'syncGoogleCalendar'])->name('sync-google-calendar')->middleware('auth:sanctum');;
 
 // Archivos
-    Route::get('/v1/files', [FileController::class, 'index'])->name('files.index')->middleware('auth:sanctum'); // funciona
-    Route::post('/v1/files', [FileController::class, 'store'])->name('files.store')->middleware('auth:sanctum'); // mirar como es con imagenes (campo file requerido, pero no soy capaz en postman)
-    Route::get('/v1/files/{id}', [FileController::class, 'show'])->name('files.show')->middleware('auth:sanctum'); // funciona
-    Route::put('/v1/files/{id}', [FileController::class, 'update'])->name('files.update')->middleware('auth:sanctum'); // mirar como es con imagenes (campo file requerido, pero no soy capaz en postman)
-    Route::delete('/v1/files/{id}', [FileController::class, 'destroy'])->name('files.destroy')->middleware('auth:sanctum'); // funciona
+    Route::get('/v1/files', [FileController::class, 'index'])->name('files.index')->middleware('auth:sanctum'); // 
+    Route::post('/v1/files', [FileController::class, 'store'])->name('files.store')->middleware('auth:sanctum'); //  
+    Route::get('/v1/files/{id}', [FileController::class, 'show'])->name('files.show')->middleware('auth:sanctum'); // 
+    Route::put('/v1/files/{id}', [FileController::class, 'update'])->name('files.update')->middleware('auth:sanctum'); // 
+    Route::delete('/v1/files/{id}', [FileController::class, 'destroy'])->name('files.destroy')->middleware('auth:sanctum'); // 
 
 // Imagenes
     Route::get('/v1/images', [ImageController::class, 'index'])->name('images.index')->middleware('auth:sanctum');
@@ -106,7 +106,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::put('/v1/images/{id}', [ImageController::class, 'update'])->name('images.update')->middleware('auth:sanctum');
     Route::delete('/v1/images/{id}', [ImageController::class, 'destroy'])->name('images.destroy')->middleware('auth:sanctum');
 
-    // pdfs
+// pdfs
     Route::post('/v1/pdfs', [PdfController::class, 'store'])->name('pdfs.store')->middleware('auth:sanctum');
     Route::get('/v1/pdfs/{pdf}', [PdfController::class, 'show'])->name('pdfs.show')->middleware('auth:sanctum');
     Route::get('/v1/pdfs/{pdf}/download', [PdfController::class, 'download'])->name('pdfs.download')->middleware('auth:sanctum');
