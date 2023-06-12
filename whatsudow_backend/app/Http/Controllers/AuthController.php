@@ -111,12 +111,6 @@ class AuthController extends Controller
         ],200);
     }
 
-                                        // comprobar que esta en sesion
-    public function infouser(Request $request)
-    {
-        return $request->user();
-    }
-
                                                     // CIERRE DE SESIÓN - LOGOUT 
     public function logout(Request $request)
     {

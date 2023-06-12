@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('availabilities', function (Blueprint $table) {
+        Schema::create('galleries', function (Blueprint $table) {
             $table->id();
+            
+            $table->string('name');
             $table->unsignedBigInteger('user_id');
-            $table->string('title');
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->enum('status', ['disponible', 'pre-reservado', 'no-disponible']);
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('availabilities');
+        Schema::dropIfExists('galleries');
     }
 };

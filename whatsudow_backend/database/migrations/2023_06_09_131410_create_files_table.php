@@ -11,19 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('budgets', function (Blueprint $table) {
+        Schema::create('files', function (Blueprint $table) {
             $table->id();
-
+            
+            $table->string('filename');
+            $table->string('path');
+            $table->string('type');
             $table->unsignedBigInteger('user_id');
-            $table->string('title');
-            $table->date('event_date')->format('d-m-Y');
-            $table->unsignedBigInteger('location_id');
-            $table->text('description');
+            $table->unsignedBigInteger('gallery_id')->nullable();
             
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('location_id')->references('id')->on('locations')->onDelete('cascade');
+            $table->foreign('gallery_id')->references('id')->on('galleries')->onDelete('cascade');
         });
     }
 
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('budgets');
+        Schema::dropIfExists('files');
     }
 };

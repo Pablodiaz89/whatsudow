@@ -22,8 +22,17 @@ class CategoryResquest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
-            'icon'=> ['required', 'string'],
+            'name' => 'required|string',
+            'icon' => 'nullable|string',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'El campo nombre es obligatorio.',
+            'name.string' => 'El campo nombre debe ser una cadena de texto.',
+            'icon.string' => 'El campo icono debe ser una cadena de texto.',
         ];
     }
 }

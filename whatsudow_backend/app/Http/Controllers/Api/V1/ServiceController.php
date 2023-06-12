@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\User;
+
 use App\Models\Service;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ServiceResquest;
+use App\Http\Resources\V1\ServiceResource;
 use App\Http\Resources\V1\ServiceCollection;
-use App\Http\Controllers\Api\V1\FileController;
+
 
 class ServiceController extends Controller
 {
@@ -18,8 +19,8 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        // muestra todos los servicios
-        return new ServiceCollection(Service::all());
+        $services = Service::all();
+        return new ServiceCollection($services);
     }
 
     /**
@@ -27,10 +28,8 @@ class ServiceController extends Controller
      */
     public function store(ServiceResquest $request)
     {
-        // obtención del usuario autenticado
         $user = Auth::user();
-        
-        // crear el servicio
+
         $service = new Service();
         $service->name = $request->name;
         $service->description = $request->description;
@@ -38,25 +37,7 @@ class ServiceController extends Controller
         $service->user_id = $user->id;
         $service->save();
 
-        
-
-        // agregar las imágenes al servicio usando el FileController
-        if ($request->has('images')) {
-            $fileController = new FileController();
-
-            foreach ($request->images as $imageData) {
-                $fileData = $fileController->store($imageData['url']);
-
-                // crear la relación entre la imagen y el servicio
-                $service->images()->create([
-                    'url' => $fileData['url'],
-                    'file_path' => $fileData['file_path'],
-                ]);
-            }
-        }
-        
-        // respuesta
-        return response()->json($service, 201); 
+        return new ServiceResource($service); 
     }
 
     /**
@@ -64,8 +45,7 @@ class ServiceController extends Controller
      */
     public function show(Service $service)
     {
-        // respuesta
-        return response()->json($service);
+        return new ServiceResource($service);
     }
 
     /**
@@ -73,33 +53,11 @@ class ServiceController extends Controller
      */
     public function update(ServiceResquest $request, Service $service)
     {
-        // validación
         $data = $request->validated();
 
-        // actualización de servicios
         $service->update($data);
 
-        // eliminar las imágenes existentes del servicio
-        $service->images()->delete();
-
-        // agregar las nuevas imágenes al servicio usando el FileController
-        if ($request->has('images')) {
-            $fileController = new FileController();
-
-            foreach ($request->images as $imageData) {
-                $fileData = $fileController->store($imageData['url']);
-
-                // crear la relación entre la imagen y el servicio
-                $service->images()->create([
-                    'url' => $fileData['url'],
-                    'file_path' => $fileData['file_path'],
-                ]);
-            }
-        }
-
-
-        // respuesta
-        return response()->json($service);
+        return new ServiceResource($service);
     }
 
     /**
@@ -107,16 +65,8 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
-        // eliminar imágenes del servicio
-        $service->images()->delete();
-
-        // desconectar el servicio del usuario
-        $user = User::find($service->user_id);
-
-        // eliminar el servicio
         $service->delete();
-        
-        // respuesta
+
         return response()->json([
             'message' => 'Servicio eliminado exitosamente'
         ]);

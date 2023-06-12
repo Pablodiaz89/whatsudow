@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api\V1;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\CategoryResquest;
+use App\Http\Resources\V1\CategoryResource;
 use App\Http\Resources\V1\CategoryCollection;
 
 class CategoryController extends Controller
@@ -15,7 +17,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return new CategoryCollection(Category::all());
+        $categories = Category::all();
+        return new CategoryCollection($categories);
     }
 
     /**
@@ -25,18 +28,24 @@ class CategoryController extends Controller
     {
         // validación
         $data = $request->validated();
+            
+        // obtén el ID del usuario autenticado
+        $userId = Auth::id();
         
-        // crear
-        $category = Category::create($data);
+        // crea la categoría
+        $category = new Category();
+        $category->name = $data['name'];
+        $category->user_id = $userId;
         
-        /*
-        // asociación del icono a la categoría
-        $category->icono = 'nombre-del-icono.png'; 
-        $category->save(); 
-        */
-
+        // asocia el icono a la categoría si se proporciona en la solicitud
+        if ($request->has('icon')) {
+            $category->icon = $request->input('icon');
+        }
+        
+        $category->save();
+        
         // respuesta
-        return response()->json($category, 201);
+        return new CategoryResource($category);
     }
 
     /**
@@ -44,8 +53,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-       // respuesta
-       return response()->json($category);
+        return new CategoryResource($category);
     }
 
     /**
@@ -56,24 +64,29 @@ class CategoryController extends Controller
         // validación
         $data = $request->validated();
 
-        // actualización
+        // actualiza la categoría
         $category->update($data);
 
-        /*
-        // asociación del icono a la categoría
-        $category->icono = 'nombre-del-icono.png'; 
-        $category->save(); 
-        */
+        // Asociar el icono a la categoría si se proporciona en la solicitud
+        if ($request->has('icon')) {
+            $icon = $request->input('icon');
+            $category->icon = $icon;
+            $category->save();
+        }
 
         // respuesta
-        return response()->json($category);
+        return new CategoryResource($category);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Category $category)
     {
-        //
+        $category->delete();
+
+        return response()->json([
+            'message' => 'Categoría eliminada con éxito'
+        ]);
     }
 }

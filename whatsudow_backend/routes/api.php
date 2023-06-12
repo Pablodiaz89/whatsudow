@@ -3,17 +3,19 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Api\V1\PdfController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\UserController;
-use App\Http\Controllers\Api\V1\ImageController;
+use App\Http\Controllers\Api\V1\PhoneController;
+use App\Http\Controllers\Api\V1\AvatarController;
 use App\Http\Controllers\Api\V1\BudgetController;
-use App\Http\Controllers\Api\V1\MessageController;
+use App\Http\Controllers\Api\V1\CompanyController;
+use App\Http\Controllers\Api\V1\GalleryController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\FavoriteController;
-use App\Http\Controllers\Api\V1\LocationController;
-use App\Http\Controllers\Api\V1\AvailabiltyController;
+use App\Http\Controllers\Api\V1\DescriptionController;
+use App\Http\Controllers\Api\V1\AvailabilityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,82 +34,89 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 // Apartado de autenticación
-    Route::post('/registerprovider', [AuthController::class, 'registerprovider']); // funciona
-    Route::post('/registerorganizer', [AuthController::class, 'registerorganizer']); // funciona
-    Route::post('/login', [AuthController::class, 'login']); // funciona
-    Route::post('/infouser', [AuthController::class, 'infouser'])->middleware('auth:sanctum'); // la tengo para comprobar si el usuario esta autenticado
-    Route::get('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum'); // funciona
+Route::post('/registerprovider', [AuthController::class, 'registerprovider']); // funciona
+Route::post('/registerorganizer', [AuthController::class, 'registerorganizer']); // funciona
+Route::post('/login', [AuthController::class, 'login']); // funciona
+Route::get('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum'); // funciona
 
-// Servicios
-    Route::get('/v1/services', [ServiceController::class, 'index'])->name('services.index')->middleware('auth:sanctum'); // funciona
-    Route::post('/v1/services', [ServiceController::class, 'store'])->name('services.store')->middleware('auth:sanctum'); // funciona
-    Route::get('/v1/services/{service}', [ServiceController::class, 'show'])->name('services.show')->middleware('auth:sanctum'); // funciona
-    Route::put('/v1/services/{service}', [ServiceController::class, 'update'])->name('services.update')->middleware('auth:sanctum'); // funciona
-    Route::delete('/v1/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy')->middleware('auth:sanctum'); // funciona
+// Versión: 1
+Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
 
-// Categorias
-    Route::get('/v1/categories', [CategoryController::class, 'index'])->name('categories.index')->middleware('auth:sanctum'); // funciona
-    Route::post('/v1/categories', [CategoryController::class, 'store'])->name('categories.store')->middleware('auth:sanctum'); // funciona
-    Route::get('/v1/categories/{category}', [CategoryController::class, 'show'])->name('categories.show')->middleware('auth:sanctum'); // funciona
-    Route::put('/v1/categories/{category}', [CategoryController::class, 'update'])->name('categories.update')->middleware('auth:sanctum'); // funciona
+// Ruta de servicios
+    Route::apiResource('services', ServiceController::class); // funciona
 
-// Perfil
-    Route::get('/v1/profile/{userId}', [UserController::class, 'showProfile'])->name('profile.show')->middleware('auth:sanctum'); // funciona
-    Route::put('/v1/profile/{userId}/name', [UserController::class, 'updateName'])->name('profile.updateName')->middleware('auth:sanctum'); // funciona
-    Route::put('/v1/profile/{userId}/email', [UserController::class, 'updateEmail'])->name('profile.updateEmail')->middleware('auth:sanctum'); // funciona
-    Route::put('/v1/profile/{userId}/password', [UserController::class, 'updatePassword'])->name('profile.updatePassword')->middleware('auth:sanctum'); // 
-    Route::put('/v1/profile/{userId}/phone', [UserController::class, 'updatePhone'])->name('profile.updatePhone')->middleware('auth:sanctum'); // 
-    Route::put('/v1/profile/{userId}/company', [UserController::class, 'updateCompany'])->name('profile.updateCompany')->middleware('auth:sanctum'); // solo me deja la primera vez
-    Route::put('/v1/profile/{userId}/document', [UserController::class, 'updateDocument'])->name('profile.updateDocument')->middleware('auth:sanctum'); // solo me deja la primera vez
-    Route::put('/v1/profile/{userId}/description', [UserController::class, 'updateDescription'])->name('profile.updateDescription')->middleware('auth:sanctum'); // solo me deja la primera vez
-    Route::delete('/v1/profile/{userId}', [UserController::class, 'deleteAccount'])->name('profile.deleteAccount')->middleware('auth:sanctum'); // funciona
+// Ruta de categorías
+    Route::apiResource('categories', CategoryController::class)->except('delete'); // funciona
 
- // Localidades
-    Route::get('v1/locations', [LocationController::class, 'index'])->name('locations.index')->middleware('auth:sanctum'); // funciona
+// Ruta de compañia - nombre empresa
+    Route::apiResource('companies', CompanyController::class); // funciona
 
-// Presupuestos (mensajes)
-    Route::get('/v1/budgets', [BudgetController::class, 'index'])->name('budgets.index')->middleware('auth:sanctum'); // funciona, pero creo que no hace falta
-    Route::post('/v1/budgets', [BudgetController::class, 'store'])->name('budgets.store')->middleware('auth:sanctum');
-    Route::get('/v1/budgets/{id}', [BudgetController::class, 'show'])->name('budgets.show')->middleware('auth:sanctum'); // 
-    Route::put('/v1/budgets/{id}', [BudgetController::class, 'update'])->name('budgets.update')->middleware('auth:sanctum'); // 
-    Route::delete('/v1/budgets/{id}', [BudgetController::class, 'destroy'])->name('budgets.destroy')->middleware('auth:sanctum');
+// Rutas de descripciones
+    Route::apiResource('descriptions', DescriptionController::class); // funciona
 
-// Controlador de mensajes (leído o no)
-    Route::put('/v1/messages/{id}/read', [MessageController::class, 'markAsRead'])->name('messages.markAsRead')->middleware('auth:sanctum'); // mensaje leíedo
-    Route::get('/v1/messages/{id}/read', [MessageController::class, 'getReadStatus'])->name('messages.getReadStatus')->middleware('auth:sanctum'); // estado de lectura
 
- // Favoritos
-    Route::post('/v1/favorites', [FavoriteController::class, 'addFavorite'])->name('favorites.add')->middleware('auth:sanctum'); // 
-    Route::delete('/v1/favorites', [FavoriteController::class, 'removeAllFavorites'])->name('favorites.remove_all')->middleware('auth:sanctum'); // 
-    Route::delete('/v1/favorites/{favoriteId}', [FavoriteController::class, 'removeSingleFavorite'])->name('favorites.remove')->middleware('auth:sanctum'); // 
-    Route::get('/v1/favorites', [FavoriteController::class, 'getFavorites'])->name('favorites.get')->middleware('auth:sanctum'); // 
+// ruta para documentos de identidad
+    Route::apiResource('documents', 'App\Http\Controllers\Api\V1\DocumentController'); // funciona: donde el controlador no me dejaba ponerlo de la otra forma
 
-// Calendario
-    Route::get('/v1/availabilities', [AvailabiltyController::class, 'index'])->name('availabilities.index')->middleware('auth:sanctum');
-    Route::post('/v1/availabilities', [AvailabiltyController::class, 'store'])->name('availabilities.store')->middleware('auth:sanctum');
-    Route::get('/v1/availabilities/{id}', [AvailabiltyController::class, 'show'])->name('availabilities.show')->middleware('auth:sanctum');
-    Route::put('/v1/availabilities/{id}', [AvailabiltyController::class, 'update'])->name('availabilities.update')->middleware('auth:sanctum');
-    Route::delete('/v1/availabilities/{id}', [AvailabiltyController::class, 'destroy'])->name('availabilities.destroy')->middleware('auth:sanctum');
-    Route::get('/v1/availability-events', [AvailabiltyController::class, 'getEvents'])->name('availabilities.getEvents')->middleware('auth:sanctum');   
+// Rutas de teléfonos
+    Route::apiResource('phones', 'App\Http\Controllers\Api\V1\PhoneController')->except('delete'); // funciona: donde el controlador no me dejaba ponerlo de la otra forma
 
-    Route::get('/v1/sync-google-calendar', [AvailabilityController::class, 'syncGoogleCalendar'])->name('sync-google-calendar')->middleware('auth:sanctum');;
+// Rutas para el perfil del usuario (nombre, apellidos y password)
+    Route::get('/profile/{id}', [UserController::class, 'showProfile'])->name('profile.show'); // funciona
+    Route::put('/profile/name/{id}', [UserController::class, 'updateName'])->name('profile.updateName'); // funciona
+    Route::put('/profile/email/{id}', [UserController::class, 'updateEmail'])->name('profile.updateEmail'); // funciona
+    Route::put('/profile/password/{id}', [UserController::class, 'updatePassword'])->name('profile.updatePassword'); // funciona
 
-// Archivos
-    Route::get('/v1/files', [FileController::class, 'index'])->name('files.index')->middleware('auth:sanctum'); // 
-    Route::post('/v1/files', [FileController::class, 'store'])->name('files.store')->middleware('auth:sanctum'); //  
-    Route::get('/v1/files/{id}', [FileController::class, 'show'])->name('files.show')->middleware('auth:sanctum'); // 
-    Route::put('/v1/files/{id}', [FileController::class, 'update'])->name('files.update')->middleware('auth:sanctum'); // 
-    Route::delete('/v1/files/{id}', [FileController::class, 'destroy'])->name('files.destroy')->middleware('auth:sanctum'); // 
+// Ruta de presupuesto 
+    Route::apiResource('budgets', BudgetController::class); // funciona (tener en cuenta que los mensajes se almacenan en messages)
 
-// Imagenes
-    Route::get('/v1/images', [ImageController::class, 'index'])->name('images.index')->middleware('auth:sanctum');
-    Route::get('/v1/images/{id}', [ImageController::class, 'show'])->name('images.show')->middleware('auth:sanctum');
-    Route::post('/v1/images', [ImageController::class, 'store'])->name('images.store')->middleware('auth:sanctum');
-    Route::put('/v1/images/{id}', [ImageController::class, 'update'])->name('images.update')->middleware('auth:sanctum');
-    Route::delete('/v1/images/{id}', [ImageController::class, 'destroy'])->name('images.destroy')->middleware('auth:sanctum');
+// Ruta mensajes (almacenamiento)
+    Route::put('messages/{message}/mark-as-read', [MessageController::class, 'markAsRead'])->name('messages.markAsRead'); 
+    Route::get('messages/{message}/read-status', [MessageController::class, 'getReadStatus'])->name('messages.readStatus');
+    Route::post('messages/{message}/reply', [MessageController::class, 'reply'])->name('messages.reply');
 
-// pdfs
-    Route::post('/v1/pdfs', [PdfController::class, 'store'])->name('pdfs.store')->middleware('auth:sanctum');
-    Route::get('/v1/pdfs/{pdf}', [PdfController::class, 'show'])->name('pdfs.show')->middleware('auth:sanctum');
-    Route::get('/v1/pdfs/{pdf}/download', [PdfController::class, 'download'])->name('pdfs.download')->middleware('auth:sanctum');
-    
+// Ruta de localizaciones (creo que no hace falta, porque  ya lo hace cuando se pide presupuesto a través de su controlador, tengo solo el metodo index para mostrar)
+    Route::apiResource('locations', 'App\Http\Controllers\Api\V1\LocationController')->except(['store', 'update', 'destroy']); // funciona
+
+// Favoritos
+    Route::post('favorites', [FavoriteController::class, 'addFavorite'])->name('favorites.add'); // funciona
+    Route::delete('favorites/{favoriteId}', [FavoriteController::class, 'removeSingleFavorite'])->name('favorites.removeSingle'); // funciona
+    Route::delete('favorites', [FavoriteController::class, 'removeAllFavorites'])->name('favorites.removeAll'); // funciona
+    Route::get('favorites', [FavoriteController::class, 'getFavorites'])->name('favorites.get'); // funciona pero le tengo que dar una vuelta con imagenes
+
+
+// Avatar
+    Route::get('avatars/{id}', [AvatarController::class, 'show'])->name('avatars.show');
+    Route::post('avatars/{id}', [AvatarController::class, 'update'])->name('avatars.update');
+
+// Rutas de disponibilidades (calendario)
+    Route::get('/availability', [AvailabilityController::class, 'index'])->name('availability.index');
+    Route::get('/availability/{id}', [AvailabilityController::class, 'show'])->name('availability.show');
+    Route::post('/availability', [AvailabilityController::class, 'store'])->name('availability.store');
+    Route::put('/availability/{id}', [AvailabilityController::class, 'update'])->name('availability.update');
+    Route::delete('/availability/{id}', [AvailabilityController::class, 'destroy'])->name('availability.destroy');
+
+// Ruta para sincronizar con Google Calendar (calendario)
+    Route::get('/availability/sync-google-calendar', [AvailabilityController::class, 'syncGoogleCalendar'])->name('availability.syncGoogleCalendar');
+ 
+// Ruta para obtener los eventos de disponibilidad
+    Route::get('/availability/events', [AvailabilityController::class, 'getEvents'])->name('availability.getEvents');
+
+
+
+
+
+
+
+
+//Ruta de archivos (almacenamiento)
+    Route::apiResource('files', FileController::class); // funciona
+
+// Ruta de Galería
+    Route::apiResource('galleries', GalleryController::class);
+
+// Ruta pdfs
+    Route::apiResource('pdfs', PdfController::class)->except(['create', 'edit']);
+    Route::get('pdfs/{id}/download', [PdfController::class, 'download'])->name('pdfs.download');
+
+});

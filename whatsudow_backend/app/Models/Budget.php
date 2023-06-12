@@ -9,7 +9,11 @@ class Budget extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'title', 'event_date', 'location', 'description'];
+    protected $fillable = [
+        'event_date',
+        'location_id',
+        'description',
+    ];
 
     public function user()
     {
@@ -25,6 +29,4 @@ class Budget extends Model
     {
         return $this->belongsTo(Location::class);
     }
-
-    
 }

@@ -21,11 +21,8 @@ class CompanyFactory extends Factory
     public function definition(): array
     {
         return [
-            'company' => fake()->sentence(3),
-
-            'user_id' => function () {
-                return User::factory()->create()->id;
-            },
+            'name' => $this->faker->sentence(3),
+            'user_id' => User::factory(),
         ];
     }
 }

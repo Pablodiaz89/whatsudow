@@ -22,7 +22,7 @@ class DescriptionFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'description' => fake()->paragraph(),
+            'description' => $this->faker->paragraph(),
         ];
     }
 }

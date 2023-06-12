@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
+
             $table->unsignedBigInteger('sender_id');
             $table->string('sender_name');
             $table->string('sender_email');
@@ -23,8 +24,9 @@ return new class extends Migration
             $table->date('event_date')->format('d-m-Y');
             $table->unsignedBigInteger('location_id');
             $table->text('description');
-            $table->text('message');
+            $table->text('message')->nullable();
             $table->boolean('read')->default(false);
+            
             $table->timestamps();
 
             $table->foreign('sender_id')->references('id')->on('users')->onDelete('cascade');

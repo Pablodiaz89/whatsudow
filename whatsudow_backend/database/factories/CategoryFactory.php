@@ -21,19 +21,9 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'icon' => fake()->sentence(1),
+            'name' => $this->faker->name,
+            'icon' => $this->faker->sentence(1),
+            'user_id' => User::factory(),
         ];
-    }
-
-    public function configure()
-    {
-        return $this->afterCreating(function (Category $category) {
-            // Obtener un usuario existente
-            $user = User::inRandomOrder()->first();
-
-            // Asignar el usuario a la categoría
-            $category->users()->attach($user->id);
-        });
     }
 }

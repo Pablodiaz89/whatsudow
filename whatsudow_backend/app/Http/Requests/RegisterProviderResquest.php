@@ -25,21 +25,21 @@ class RegisterProviderResquest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'phone' => ['required', 'numeric'],
-            'password' => ['required', 'confirmed', PasswordRules::min(8)->letters()->symbols()->numbers()],
+            'phone' => ['required', 'string'],
+            'password' => ['required', 'confirmed', PasswordRules::min(8)],
         ];
     }
 
     public function messages()       
     {
         return [
-            'name' => 'El Nombre es obligatorio',
+            'name.required' => 'El Nombre es obligatorio',
             'email.required' => 'El Email es obligatorio',
             'email.email' => 'El Email no es válido',
             'email.unique' => 'El usuario ya esta registrado',
             'phone.required' => 'El Teléfono es obligatorio',
-            'phone.numeric' => 'El Teléfono solo puede contener números',
-            'password' => 'El Password debe de contener al menos 8 caracteres, un simbolo y un número',
+            //'phone.numeric' => 'El Teléfono solo puede contener números',
+            'password' => 'El Password debe de contener al menos 8 caracteres',
             'password.confirmed' => 'Los Passwords no coinciden',
         ];
     }

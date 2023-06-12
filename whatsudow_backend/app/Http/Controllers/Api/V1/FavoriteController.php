@@ -15,7 +15,7 @@ class FavoriteController extends Controller
         $userId = Auth::id();
         $serviceId = $request->input('service_id');
 
-        // verificación si el servicio ya está en favoritos 
+        // verifica si el servicio ya está en favoritos 
         $existingFavorite = Favorite::where('user_id', $userId)
             ->where('service_id', $serviceId)
             ->exists();
@@ -24,7 +24,7 @@ class FavoriteController extends Controller
             return response()->json(['message' => 'El servicio ya está en favoritos']);
         }
 
-        // crear un nuevo registro de favorito
+        // crea un nuevo registro de favorito
         $favorite = new Favorite();
         $favorite->user_id = $userId;
         $favorite->service_id = $serviceId;
@@ -34,7 +34,7 @@ class FavoriteController extends Controller
     }
 
 
-    // eliminar todos los favoritos
+    // elimina todos los favoritos
     public function removeAllFavorites()
     {
         $userId = Auth::id();
@@ -43,7 +43,7 @@ class FavoriteController extends Controller
         return response()->json(['message' => 'Todos los favoritos fueron eliminados']);
     }
 
-    // eliminar un favoritos especificio
+    // elimina un favoritos especificio
     public function removeSingleFavorite($favoriteId)
     {
         $userId = Auth::id();
@@ -59,7 +59,7 @@ class FavoriteController extends Controller
     {
         $userId = Auth::id();
         $favorites = Favorite::where('user_id', $userId)
-        ->with('service.user', 'service.images')
+        ->with('service.user')
         ->get();
 
     return response()->json($favorites);

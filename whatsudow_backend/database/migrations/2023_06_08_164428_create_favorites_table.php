@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pdfs', function (Blueprint $table) {
+        Schema::create('favorites', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('file_id')->constrained('files')->onDelete('cascade');
-
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('service_id');
+            
             $table->timestamps();
 
-            
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
         });
     }
 
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pdfs');
+        Schema::dropIfExists('favorites');
     }
 };

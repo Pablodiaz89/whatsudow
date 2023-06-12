@@ -12,12 +12,13 @@ class Category extends Model
     protected $fillable = [
         'name',
         'icon',
+        'user_id',
     ];
 
 
-    public function users() // una categoria tiene varios usuarios
+    public function users()
     {
-        return $this->belongsToMany(User::class, 'category_user')->withTimestamps();
+        return $this->hasMany(User::class);
     }
 
     public function services() // una categoria pertenece a varios servicios

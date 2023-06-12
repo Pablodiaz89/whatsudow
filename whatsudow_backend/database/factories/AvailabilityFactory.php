@@ -2,8 +2,10 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Availability;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Availability>
@@ -20,12 +22,19 @@ class AvailabilityFactory extends Factory
      */
     public function definition(): array
     {
+        $startDate = $this->faker->dateTimeBetween('-1 month', '+1 month')->format('d/m/Y');
+        $endDate = Carbon::createFromFormat('d/m/Y', $startDate)
+            ->addHours($this->faker->numberBetween(1, 12))
+            ->format('d/m/Y');
+
         return [
-            'user_id' => 1, 
+            'user_id' => function () {
+                return User::factory()->create()->id;
+            },
             'title' => $this->faker->sentence,
-            'start_date' => $this->faker->dateTimeBetween('now', '+1 week'),
-            'end_date' => $this->faker->dateTimeBetween('now', '+2 weeks'),
-            'status' => $this->faker->randomElement(['disponible', 'pre-reservado', 'no-disponible']),
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'status' => $this->faker->randomElement(['disponible', 'pre-reservado', 'no disponible']),
         ];
     }
 }

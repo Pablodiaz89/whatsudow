@@ -22,7 +22,7 @@ class DocumentFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'document_identification' => fake()->unique()->randomNumber(8),
+            'document_indetification' => $this->faker->unique()->randomNumber(8),
         ];
     }
 }

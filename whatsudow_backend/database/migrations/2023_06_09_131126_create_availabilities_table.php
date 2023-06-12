@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('files', function (Blueprint $table) {
+        Schema::create('availabilities', function (Blueprint $table) {
             $table->id();
             
-            $table->string('filename');
-            $table->string('path');
-            $table->string('type');
             $table->unsignedBigInteger('user_id');
+            $table->string('title');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->enum('status', ['disponible', 'pre-reservado', 'no-disponible'])->charset('utf8')->collation('utf8_unicode_ci');
+            
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('files');
+        Schema::dropIfExists('availabilities');
     }
 };

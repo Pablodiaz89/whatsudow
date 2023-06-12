@@ -39,14 +39,19 @@ class Message extends Model
         return $this->belongsTo(Message::class, 'parent_id');
     }
 
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
+    }
+
     public function replies()
     {
         return $this->hasMany(Message::class, 'parent_id');
     }
 
-    public function location()
+    public function budget()
     {
-        return $this->belongsTo(Location::class);
+        return $this->belongsTo(Budget::class);
     }
 }
 

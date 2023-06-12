@@ -3,10 +3,6 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Models\User;
-use App\Models\Phone;
-use App\Models\Document;
-use App\Models\Description;
-use App\Models\Company;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -20,8 +16,6 @@ class UserController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Usuario no encontrado'], 404);
         }
-
-        $user->load('phone', 'company', 'document', 'description');
 
         return response()->json($user);
     }
@@ -77,133 +71,12 @@ class UserController extends Controller
         }
 
         $request->validate([
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
         ]);
 
         $user->password = bcrypt($request->input('password'));
         $user->save();
 
         return response()->json(['message' => 'Contraseña actualizada exitosamente']);
-    }
-
-
-    // actualizar teléfono
-    public function updatePhone(Request $request, $userId)
-    {
-        $user = User::find($userId);
-
-        if (!$user) {
-            return response()->json(['message' => 'Usuario no encontrado'], 404);
-        }
-
-        $request->validate([
-            'phone' => 'required|numeric',
-        ]);
-
-        $phone = Phone::updateOrCreate(['user_id' => $user->id], ['phone' => $request->input('phone')]);
-        $user->phone()->associate($phone);
-        $user->save();
-
-        return response()->json(['message' => 'Teléfono actualizado con éxito']);
-    }
-
-    // actualizar compañia
-    public function updateCompany(Request $request, $userId)
-    {
-        $user = User::find($userId);
-
-        if (!$user) {
-            return response()->json(['message' => 'Usuario no encontrado'], 404);
-        }
-
-        $request->validate([
-            'company' => 'required|string',
-        ]);
-    
-        $company = $user->company;
-
-        if (!$company) {
-            $company = new Company();
-            $company->user_id = $user->id; 
-        }
-    
-        $company->company = $request->input('company');
-        $company->save();
-    
-        $user->company()->associate($company);
-
-        return response()->json(['message' => 'Empresa actualizada con éxito']);
-    }
-
-    // actualizar documento
-    public function updateDocument(Request $request, $userId)
-    {
-        $user = User::find($userId);
-
-        if (!$user) {
-            return response()->json(['message' => 'Usuario no encontrado'], 404);
-        }
-
-        $request->validate([
-            'document' => 'required|string',
-        ]);
-    
-        $document = $user->document;
-    
-        if (!$document) {
-            $document = new Document();
-            $document->user_id = $user->id; 
-        }
-    
-        $document->document_identification = $request->input('document');
-        $document->save();
-    
-        $user->document()->save($document);
-    
-        return response()->json(['message' => 'Documento actualizado con éxito']);
-    }
-
-    // actualizar descripcion
-    public function updateDescription(Request $request, $userId)
-    {
-        $user = User::find($userId);
-
-        if (!$user) {
-            return response()->json(['message' => 'Usuario no encontrado'], 404);
-        }
-
-        $request->validate([
-            'description' => 'sometimes|string',
-        ]);
-    
-        $description = $user->description;
-    
-        if (!$description) {
-            $description = new Description();
-            $description->user_id = $user->id;
-        }
-    
-        $description->description = $request->input('description', '');
-        $description->save();
-    
-        $user->description()->save($description);
-
-        return response()->json(['message' => 'Descripción actualizada con éxito']);
-    }
-    
-
-
-    // borrar cuenta
-    public function deleteAccount($userId)
-    {
-        $user = User::find($userId);
-
-        if (!$user) {
-            return response()->json(['message' => 'Usuario no encontrado'], 404);
-        }
-
-        $user->delete();
-
-        return response()->json(['message' => 'Cuenta eliminada con éxito']);
     }
 }

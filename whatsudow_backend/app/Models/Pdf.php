@@ -11,7 +11,7 @@ class Pdf extends Model
 
     protected $fillable = [
         'file_id',
-        'pdf_id',
+        'session_id',
     ];
 
     public function file()
@@ -19,7 +19,7 @@ class Pdf extends Model
         return $this->belongsTo(File::class);
     }
 
-    public function pdf()
+    public function session()
     {
         return $this->belongsTo(Session::class);
     }

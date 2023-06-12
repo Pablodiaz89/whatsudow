@@ -3,11 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Avatar;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Models\Permission;
 
 class User extends Authenticatable
 {
@@ -46,7 +48,15 @@ class User extends Authenticatable
 
 
 
+    public function services() // un usuario tiene varios servicios 
+    {
+        return $this->hasMany(Service::class);
+    }
 
+    public function avatar()
+    {
+        return $this->hasOne(Avatar::class);
+    }
 
     public function company()
     {
@@ -63,26 +73,46 @@ class User extends Authenticatable
         return $this->hasOne(Description::class);
     }
 
+    public function files()
+    {
+        return $this->hasMany(File::class);
+    }
+
+    public function galleries()
+    {
+        return $this->hasMany(Gallery::class);
+    }
+    
+    public function budgets()
+    {
+        return $this->hasMany(Budget::class);
+    }
+
     public function phone()
     {
         return $this->hasOne(Phone::class);
     }
 
-    public function categories() // un usuario puede pertenecer a varias categorias
+    public function category()
     {
-        return $this->belongsToMany(Category::class, 'category_user')->withTimestamps();
+        return $this->belongsTo(Category::class);
     }
 
-    public function services() // un usuario tiene varios servicios 
+    public function sentMessages()
     {
-        return $this->hasMany(Service::class);
+        return $this->hasMany(Message::class, 'sender_id');
     }
 
-    public function budgets()
+    public function receivedMessages()
     {
-        return $this->hasMany(Budget::class);
+        return $this->hasMany(Message::class, 'addressee_id');
     }
-    
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
     public function locations()
     {
         return $this->belongsTo(Location::class);
@@ -91,10 +121,5 @@ class User extends Authenticatable
     public function availabilities()
     {
         return $this->hasMany(Availability::class);
-    }
-
-    public function files()
-    {
-        return $this->hasMany(File::class);
     }
 }

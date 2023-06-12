@@ -3,18 +3,22 @@
 namespace App\Http\Controllers\Api\V1;
 
 use Carbon\Carbon;
+use Google\Client;
 use App\Models\User;
 use App\Models\Availability;
+use Google\Service\Calendar;
 use Illuminate\Http\Request;
+use Google\Service\Calendar\Event;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Google\Client;
-use Google\Service\Calendar;
-use Google\Service\Calendar\Event;
 use Spatie\Permission\Traits\HasRoles;
 
-class AvailabiltyController extends Controller
+use App\Http\Requests\AvailabilityRequest;
+use App\Http\Resources\V1\AvailabilityResource;
+use App\Http\Resources\V1\AvailabilityCollection;
+
+class AvailabilityController extends Controller
 {
     use HasRoles;
 
@@ -55,24 +59,17 @@ class AvailabiltyController extends Controller
      */
     public function index() // obtener las disponibilidades del proveedor actual
     {
-        $availabilities = Availability::where('user_id', Auth::id())->get();
+        $availabilities = Availability::where('user_id', auth()->id())->get();
 
-        return response()->json($availabilities);
+        return AvailabilityResource::collection($availabilities);
     }
 
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) // almacena la disponibilidad del proveedor
+    public function store(AvailabilityRequest $request) // almacena la disponibilidad del proveedor
     {
-        // validación de los datos de entrada
-        $request->validate([
-            'title' => 'required',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'status' => 'required|in:disponible,pre-reservado,no-disponible',
-        ]);
 
         // verificar si es proveedor
         if (!$this->hasRole('proveedor')) {
@@ -83,8 +80,8 @@ class AvailabiltyController extends Controller
         $availability = new Availability();
         $availability->user_id = Auth::user()->id;
         $availability->title = $request->input('title');
-        $availability->start_date = $request->input('start_date');
-        $availability->end_date = $request->input('end_date');
+        $availability->start_date = Carbon::createFromFormat('d/m/Y', $request->input('start_date'));
+        $availability->end_date = Carbon::createFromFormat('d/m/Y', $request->input('end_date'));
         $availability->status = $request->input('status');
         $availability->save();
 
@@ -92,12 +89,12 @@ class AvailabiltyController extends Controller
         $event = new Event([
             'summary' => $availability->title,
             'start' => [
-                'dateTime' => Carbon::parse($availability->start_date)->toIso8601String(),
-                'timeZone' => 'America/New_York', // Ajusta el timezone según sea necesario
+                'dateTime' => Carbon::parse($availability->start_date)->format('d/m/Y\TH:i:sP'),
+                'timeZone' => 'Europe/Madrid',
             ],
             'end' => [
-                'dateTime' => Carbon::parse($availability->end_date)->toIso8601String(),
-                'timeZone' => 'America/New_York', // Ajusta el timezone según sea necesario
+                'dateTime' => Carbon::parse($availability->end_date)->format('d/m/Y\TH:i:sP'),
+                'timeZone' => 'Europe/Madrid',
             ],
         ]);
 
@@ -105,7 +102,7 @@ class AvailabiltyController extends Controller
 
         $event = $this->calendarService->events->insert($calendarId, $event);
 
-        return response()->json($availability, 201);
+        return new AvailabilityResource($availability);
     }
 
     /**
@@ -120,23 +117,15 @@ class AvailabiltyController extends Controller
             return response()->json(['message' => 'No se encontró la disponibilidad'], 404);
         }
 
-        return response()->json($availability);
+        return new AvailabilityResource($availability);
     }
 
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id) // actualizar disponibilidad del proveedor
+    public function update(AvailabilityRequest $request, string $id) // actualizar disponibilidad del proveedor
     {
-        // validación de datos
-        $request->validate([
-            'title' => 'required',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'status' => 'required|in:disponible,pre-reservado,no-disponible',
-        ]);
-
         // verificación si es proveedor
         if (!$this->hasRole('proveedor')) {
             return response()->json(['message' => 'No tienes permiso para realizar esta acción'], 403);
@@ -150,12 +139,12 @@ class AvailabiltyController extends Controller
 
         // actualizar disponibilidad
         $availability->title = $request->input('title');
-        $availability->start_date = $request->input('start_date');
-        $availability->end_date = $request->input('end_date');
+        $availability->start_date = Carbon::createFromFormat('d/m/Y', $request->input('start_date'));
+        $availability->end_date = Carbon::createFromFormat('d/m/Y', $request->input('end_date'));
         $availability->status = $request->input('status');
         $availability->save();
 
-        return response()->json($availability);
+        return new AvailabilityResource($availability);
 
     }
 
@@ -185,38 +174,37 @@ class AvailabiltyController extends Controller
     
     public function getEvents() // obtiene los eventos de disponibilidad del proveedor
     {
-       // verificar si es proveedor o organizador
-       if ($this->hasAnyRole(['proveedor', 'organizador'])) {
-        
-        $providers = Role::where('name', 'proveedor')->first()->users; // obtener proveedor y disponibilidad
+        // verificar si es proveedor o organizador
+        if ($this->hasAnyRole(['proveedor', 'organizador'])) {
+            $providers = Role::where('name', 'proveedor')->first()->users; // obtener proveedor y disponibilidad
 
-        // eventos disponibles proveedor
-        $events = [];
-        foreach ($providers as $provider) {
-            $availabilities = Availability::where('user_id', $provider->id)->get();
+            // eventos disponibles proveedor
+            $events = [];
+            foreach ($providers as $provider) {
+                $availabilities = Availability::where('user_id', $provider->id)->get();
 
-            foreach ($availabilities as $availability) {
-                $start = Carbon::parse($availability->start_date);
-                $end = Carbon::parse($availability->end_date);
+                foreach ($availabilities as $availability) {
+                    $start = Carbon::parse($availability->start_date)->format('d/m/Y');
+                    $end = Carbon::parse($availability->end_date)->format('d/m/Y');
 
-                // definir el color de disponibilidad
-                $color = $availability->status === 'disponible' ? 'green' : ($availability->status === 'pre-reservado' ? 'yellow' : 'red');
+                    // definir el color de disponibilidad
+                    $color = $availability->status === 'disponible' ? 'green' : ($availability->status === 'pre-reservado' ? 'yellow' : 'red');
 
-                $event = [
-                    'title' => $availability->title,
-                    'start' => $start->toDateTimeString(),
-                    'end' => $end->toDateTimeString(),
-                    'color' => $color,
-                    'proveedor' => $provider->name,
-                ];
+                    $event = [
+                        'title' => $availability->title,
+                        'start' => $start,
+                        'end' => $end,
+                        'color' => $color,
+                        'proveedor' => $provider->name,
+                    ];
 
-                $events[] = $event;
+                    $events[] = $event;
+                }
             }
+
+            return response()->json($events);
         }
 
-        return response()->json($events);
-        } else {
-            return response()->json(['message' => 'No tienes permiso para acceder a esta información'], 403);
-        }
+        return response()->json(['message' => 'No tienes permiso para realizar esta acción'], 403);
     }
 }

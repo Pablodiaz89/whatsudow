@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Models\File;
+use App\Models\Gallery;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\FileResource;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\UploadFileRequest;
 use Illuminate\Support\Facades\Validator;
 
 class FileController extends Controller
@@ -16,22 +19,14 @@ class FileController extends Controller
     public function index()
     {
         $files = File::all();
-        return response()->json($files);
+        return FileResource::collection($files);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(UploadFileRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'file' => 'required|file|max:25000',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()->first()], 400);
-        }
-
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
         $type = $file->getMimeType();
@@ -39,7 +34,11 @@ class FileController extends Controller
 
         $path = $request->user()->id . '/' . $type . '/' . $filename;
 
-        Storage::disk('local')->put($path, file_get_contents($file));
+        try {
+            Storage::disk('local')->put($path, file_get_contents($file));
+        } catch (\Exception $e) {
+            abort(500, 'Error al guardar el archivo');
+        }
 
         $fileModel = new File();
         $fileModel->filename = $filename;
@@ -48,7 +47,15 @@ class FileController extends Controller
         $fileModel->user_id = $request->user()->id;
         $fileModel->save();
 
-        return response()->json(['message' => 'Archivo subido exitosamente']);
+        if ($request->has('gallery_id')) {
+            $gallery = Gallery::find($request->gallery_id);
+            if ($gallery) {
+                $fileModel->gallery()->associate($gallery);
+                $fileModel->save();
+            }
+        }
+
+        return new FileResource($fileModel);
     }
 
     /**
@@ -59,25 +66,17 @@ class FileController extends Controller
         $file = File::find($id);
 
         if (!$file) {
-            return response()->json(['message' => 'Archivo no encontrado'], 404);
+            abort(404, 'Archivo no encontrado');
         }
 
-        return response()->json($file);
+        return new FileResource($file);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UploadFileRequest $request, string $id)
     {
-        $validator = Validator::make($request->all(), [
-            'file' => 'required|file|max:25000',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()->first()], 400);
-        }
-
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
         $type = $file->getMimeType();
@@ -85,16 +84,35 @@ class FileController extends Controller
 
         $path = $request->user()->id . '/' . $type . '/' . $filename;
 
-        Storage::disk('local')->put($path, file_get_contents($file));
+        try {
+            Storage::disk('local')->put($path, file_get_contents($file));
+        } catch (\Exception $e) {
+            abort(500, 'Error al guardar el archivo');
+        }
 
-        $fileModel = new File();
+        $fileModel = File::find($id);
+
+        if (!$fileModel) {
+            abort(404, 'Archivo no encontrado');
+        }
+
+        Storage::disk('local')->delete($fileModel->path);
+
         $fileModel->filename = $filename;
         $fileModel->path = $path;
         $fileModel->type = $type;
         $fileModel->user_id = $request->user()->id;
         $fileModel->save();
 
-        return response()->json(['message' => 'Archivo subido exitosamente']);
+        if ($request->has('gallery_id')) {
+            $gallery = Gallery::find($request->gallery_id);
+            if ($gallery) {
+                $fileModel->gallery()->associate($gallery);
+                $fileModel->save();
+            }
+        }
+
+        return new FileResource($fileModel);
     }
 
     /**
@@ -105,12 +123,12 @@ class FileController extends Controller
         $file = File::find($id);
 
         if (!$file) {
-            return response()->json(['message' => 'Archivo no encontrado'], 404);
+            abort(404, 'Archivo no encontrado');
         }
 
         Storage::disk('local')->delete($file->path);
         $file->delete();
 
-        return response()->json(['message' => 'Archivo eliminado exitosamente']);
+        return ['message' => 'Archivo eliminado exitosamente'];
     }
 }

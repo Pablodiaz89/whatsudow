@@ -6,6 +6,8 @@ use App\Models\Location;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\V1\LocationResource;
+use App\Http\Resources\V1\LocationCollection;
 
 class LocationController extends Controller
 {
@@ -16,7 +18,7 @@ class LocationController extends Controller
     {
         $locations = Location::all();
 
-        return response()->json($locations);
+        return new LocationCollection($locations);
     }
 
     /**
@@ -32,7 +34,9 @@ class LocationController extends Controller
      */
     public function show(string $id)
     {
-        
+        $location = Location::findOrFail($id);
+
+        return new LocationResource($location);
     }
 
     /**

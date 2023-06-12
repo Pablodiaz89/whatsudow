@@ -13,7 +13,8 @@ class Service extends Model
     protected $fillable = [
         'name',
         'description',
-        'price'       
+        'price',
+        'category_id'   
     ];
 
     public function user()  // un servicio pertene a un usuario
@@ -26,8 +27,13 @@ class Service extends Model
         return $this->belongsToMany(Location::class, 'location_service')->withTimestamps();
     }
 
-    public function images()
+    public function category()
     {
-        return $this->hasMany(Image::class);
+        return $this->belongsTo(Category::class);
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
     }
 }
