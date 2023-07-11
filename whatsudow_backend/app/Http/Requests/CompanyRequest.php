@@ -19,14 +19,14 @@ class CompanyRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
+    public function rules(): array // validaciones
     {
         return [
             'name' => 'required|string',
         ];
     }
 
-    public function messages(): array
+    public function messages(): array // mensajes de errores
     {
         return [
             'name.required' => 'El campo nombre es obligatorio.',

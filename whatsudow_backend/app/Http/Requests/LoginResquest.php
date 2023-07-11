@@ -19,15 +19,15 @@ class LoginResquest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
+    public function rules(): array // validaciones
     {
         return [
-            'email' => ['required', 'email', 'exists:users,email'], 
+            'email' => ['required', 'email', 'exists:users,email'],
             'password' => ['required'],
         ];
     }
-                           
-    public function messages()             
+
+    public function messages()   // mensajes de errores           
     {
         return [
             'email.required' => 'El email es obligatorio',

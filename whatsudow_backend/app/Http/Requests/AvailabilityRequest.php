@@ -19,7 +19,7 @@ class AvailabilityRequest  extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
+    public function rules(): array // validaciones
     {
         return [
             'title' => 'required',
@@ -29,7 +29,7 @@ class AvailabilityRequest  extends FormRequest
         ];
     }
 
-    public function messages(): array
+    public function messages(): array // mensajes de errores
     {
         return [
             'title.required' => 'El campo título es obligatorio.',

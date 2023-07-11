@@ -19,7 +19,7 @@ class PdfRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
+    public function rules(): array // validaciones
     {
         return [
             'file' => 'required|file|max:25000|mimes:pdf',
@@ -27,7 +27,7 @@ class PdfRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
+    public function messages(): array // mensajes de errores
     {
         return [
             'file.required' => 'El campo archivo es obligatorio.',

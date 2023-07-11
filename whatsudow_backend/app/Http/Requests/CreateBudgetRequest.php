@@ -19,7 +19,7 @@ class CreateBudgetRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
+    public function rules(): array // validaciones
     {
         return [
             'user_id' => 'required|exists:users,id',
@@ -30,7 +30,7 @@ class CreateBudgetRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
+    public function messages(): array // mensajes de errores
     {
         return [
             'user_id.required' => 'El campo ID de usuario es obligatorio.',

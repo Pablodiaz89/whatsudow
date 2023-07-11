@@ -20,7 +20,7 @@ class RegisterProviderResquest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array 
+    public function rules(): array  // validaciones
     {
         return [
             'name' => ['required', 'string'],
@@ -30,7 +30,7 @@ class RegisterProviderResquest extends FormRequest
         ];
     }
 
-    public function messages()       
+    public function messages()        // mensajes de errores
     {
         return [
             'name.required' => 'El Nombre es obligatorio',

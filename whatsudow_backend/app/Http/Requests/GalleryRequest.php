@@ -19,16 +19,16 @@ class GalleryRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
+    public function rules(): array // validaciones
     {
         return [
             'name' => 'required|string|max:255',
             'images' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:25000', 
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:25000',
         ];
     }
 
-    public function messages(): array
+    public function messages(): array // mensajes de errores
     {
         return [
             'name.required' => 'El campo nombre es obligatorio.',
