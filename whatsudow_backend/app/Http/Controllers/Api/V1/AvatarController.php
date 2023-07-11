@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\UploadFileRequest;
 use App\Http\Resources\V1\AvatarResource;
 
+// controlador que maneja las solitudes de los avatars o imagenes de perfil
+
 class AvatarController extends Controller
 {
     /**
@@ -31,7 +33,7 @@ class AvatarController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id) // muestra el avatar específico de un usuario en concreto.
     {
         $user = Auth::user();
 
@@ -45,7 +47,7 @@ class AvatarController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UploadFileRequest $request)
+    public function update(UploadFileRequest $request) // actualiza el avatar de un usuario en concreto. Lo almacena usando el controlador FileController
     {
         $user = Auth::user();
 

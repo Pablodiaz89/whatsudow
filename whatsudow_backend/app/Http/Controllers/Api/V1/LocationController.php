@@ -9,12 +9,14 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\V1\LocationResource;
 use App\Http\Resources\V1\LocationCollection;
 
+// este controlador maneja las localizaciones de ubicación. ... para actualizar o crear si no existe esta relacionada en el controlador BudgetController de presupuesto
+
 class LocationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index() // devuelve todas las ubicaciones
     {
         $locations = Location::all();
 
@@ -26,13 +28,12 @@ class LocationController extends Controller
      */
     public function store(Request $request)
     {
-       
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id) // muestra una ubicación específica
     {
         $location = Location::findOrFail($id);
 
@@ -44,7 +45,6 @@ class LocationController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        
     }
 
     /**
@@ -52,6 +52,5 @@ class LocationController extends Controller
      */
     public function destroy(string $id)
     {
-        
     }
 }

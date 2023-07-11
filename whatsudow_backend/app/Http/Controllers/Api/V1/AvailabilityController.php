@@ -18,13 +18,16 @@ use App\Http\Requests\AvailabilityRequest;
 use App\Http\Resources\V1\AvailabilityResource;
 use App\Http\Resources\V1\AvailabilityCollection;
 
+
+// Este controlador es de disponibilidad (calendario - sistema de citas)
+
 class AvailabilityController extends Controller
 {
     use HasRoles;
 
     private $calendarService;
 
-    public function __construct()
+    public function __construct() // inicia el cliente de Google Calendar con las credenciales de la aplicación
     {
         // cliente de Google Calendar
         $client = new Client();
@@ -39,7 +42,7 @@ class AvailabilityController extends Controller
         $this->calendarService = new Calendar($client);
     }
 
-    public function syncGoogleCalendar()
+    public function syncGoogleCalendar() // redirige al usuario a la página de autenticación de Google ara sincronizar el calendario
     {
         $client = new Client();
         $client->setClientId(env('GOOGLE_CLIENT_ID'));
@@ -68,7 +71,7 @@ class AvailabilityController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(AvailabilityRequest $request) // almacena la disponibilidad del proveedor
+    public function store(AvailabilityRequest $request) // crea una nueva disponibilidad para el proveedor y la almacena en la base de datos. Tambien crea un evento en Google Calendar para esa disponibilidad
     {
 
         // verificar si es proveedor
@@ -108,7 +111,7 @@ class AvailabilityController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id) // muestra la disponibilidad específica del proveedor
     {
         // obtener disponibilidad especifica del proveedor que vemos
         $availability = Availability::where('user_id', Auth::user()->id)->find($id);
@@ -124,7 +127,7 @@ class AvailabilityController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AvailabilityRequest $request, string $id) // actualizar disponibilidad del proveedor
+    public function update(AvailabilityRequest $request, string $id) // actualiza la disponibilidad especifica del proveedor
     {
         // verificación si es proveedor
         if (!$this->hasRole('proveedor')) {
@@ -145,13 +148,12 @@ class AvailabilityController extends Controller
         $availability->save();
 
         return new AvailabilityResource($availability);
-
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id) // elimina la disponibilidad del proveedor
+    public function destroy(string $id) // elimina la disponibilidad del proveedor especifico
     {
         // verificar si es proveedor
         if (!$this->hasRole('proveedor')) {
@@ -171,8 +173,8 @@ class AvailabilityController extends Controller
     }
 
 
-    
-    public function getEvents() // obtiene los eventos de disponibilidad del proveedor
+
+    public function getEvents() // obtiene los eventos de disponibilidad del proveedor. Cada evento se colorea de acuerdo con el estado de la disponibilidad: verde para disponible, amarillo para pre-reservado y rojo para no disponible.
     {
         // verificar si es proveedor o organizador
         if ($this->hasAnyRole(['proveedor', 'organizador'])) {

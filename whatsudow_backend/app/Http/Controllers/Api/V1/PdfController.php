@@ -13,12 +13,14 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\V1\PdfCollection;
 use Illuminate\Support\Facades\Validator;
 
+// este controlador maneja los pdf
+
 class PdfController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index() // devuelve los pdfs
     {
         $pdfs = Pdf::all();
 
@@ -28,7 +30,7 @@ class PdfController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(PdfRequest $request)
+    public function store(PdfRequest $request) // almacena un nuevo pdf en la base de datos a través del controlador FileController que lo almacena
     {
         $validatedData = $request->validated();
 
@@ -56,7 +58,7 @@ class PdfController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id) // muestra los detalles de un pdf
     {
         $pdf = Pdf::find($id);
 
@@ -70,7 +72,7 @@ class PdfController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PdfRequest $request, string $id)
+    public function update(PdfRequest $request, string $id) // actualiza los datos de un pdf y los actualiza en el sistema de almacenamiento a través de FileController
     {
         $validatedData = $request->validated();
 
@@ -103,7 +105,7 @@ class PdfController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id, FileController $fileController)
+    public function destroy($id, FileController $fileController) // elimina un pdf específico
     {
         $user = Auth::user();
 
@@ -128,7 +130,7 @@ class PdfController extends Controller
         return response()->json(['message' => 'PDF eliminado exitosamente']);
     }
 
-    public function download($id)
+    public function download($id) // descarga un pdf específico
     {
         $pdf = Pdf::find($id);
 

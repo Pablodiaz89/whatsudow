@@ -11,12 +11,14 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UploadFileRequest;
 use Illuminate\Support\Facades\Validator;
 
+// este controlador maneja el sistema de almacenamiento de archivos
+
 class FileController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index() // devuelve los archivos
     {
         $files = File::all();
         return FileResource::collection($files);
@@ -25,7 +27,7 @@ class FileController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(UploadFileRequest $request)
+    public function store(UploadFileRequest $request) // almacena un nuevo archivo en el sistema de almacenamiento
     {
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
@@ -61,7 +63,7 @@ class FileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id) // muestra un archivo específico
     {
         $file = File::find($id);
 
@@ -75,7 +77,7 @@ class FileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UploadFileRequest $request, string $id)
+    public function update(UploadFileRequest $request, string $id) // actualiza el archivo específico 
     {
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
@@ -118,7 +120,7 @@ class FileController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id) // elimina el archivo existente
     {
         $file = File::find($id);
 

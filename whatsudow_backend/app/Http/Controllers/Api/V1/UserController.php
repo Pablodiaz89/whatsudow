@@ -6,10 +6,12 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
+// este controlador para los datos de usuario, como: nombre, email y contraseña
+
 class UserController extends Controller
 {
-    // ver perfil del usuario
-    public function showProfile($userId)
+
+    public function showProfile($userId) // ver perfil del usuario
     {
         $user = User::find($userId);
 
@@ -21,8 +23,8 @@ class UserController extends Controller
     }
 
 
-    // actualizar nombre
-    public function updateName(Request $request, $userId)
+
+    public function updateName(Request $request, $userId) // actualizar nombre
     {
         $user = User::find($userId);
 
@@ -41,8 +43,8 @@ class UserController extends Controller
     }
 
 
-    // actualizar email
-    public function updateEmail(Request $request, $userId)
+
+    public function updateEmail(Request $request, $userId) // actualizar email
     {
         $user = User::find($userId);
 
@@ -61,8 +63,8 @@ class UserController extends Controller
     }
 
 
-    // actualizar contraseña
-    public function updatePassword(Request $request, $userId)
+
+    public function updatePassword(Request $request, $userId) // actualizar contraseña
     {
         $user = User::find($userId);
 

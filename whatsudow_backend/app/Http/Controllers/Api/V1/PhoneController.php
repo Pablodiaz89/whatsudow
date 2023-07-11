@@ -9,12 +9,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\V1\PhoneResource;
 
+// este controlador es para los teléfonos de los usuarios
+
 class PhoneController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index() // muestra los teléfonos
     {
         $user = auth()->user();
         $phones = $user->phones;
@@ -25,7 +27,7 @@ class PhoneController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(PhoneRequest $request)
+    public function store(PhoneRequest $request) // almacena un nuevo teléfono en la base de datos
     {
         $user = auth()->user();
 
@@ -40,7 +42,7 @@ class PhoneController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($id) // muestra el teléfono específico de un usuario
     {
         $user = auth()->user();
         $phone = $user->phone;
@@ -55,7 +57,7 @@ class PhoneController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PhoneRequest $request, $id)
+    public function update(PhoneRequest $request, $id) // actualiza el teléfono específico de un usuario
     {
         $user = auth()->user();
         $phone = $user->phone;

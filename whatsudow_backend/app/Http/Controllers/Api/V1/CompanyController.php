@@ -11,12 +11,14 @@ use App\Http\Requests\CompanyRequest;
 use App\Http\Resources\V1\CompanyResource;
 use App\Http\Resources\V1\CompanyCollection;
 
+// este controlador maneja los nombres de las empresas o compañias empresariales
+
 class CompanyController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index() // retorna la empresa
     {
         $companies = Company::all();
         return new CompanyCollection($companies);
@@ -25,7 +27,7 @@ class CompanyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CompanyRequest $request)
+    public function store(CompanyRequest $request) // almacena la empresa del usuario
     {
         $user = Auth::user();
 
@@ -40,7 +42,7 @@ class CompanyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Company $company)
+    public function show(Company $company) // muestra la empresa
     {
         return new CompanyResource($company);
     }
@@ -48,7 +50,7 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CompanyRequest $request, Company $company)
+    public function update(CompanyRequest $request, Company $company) // actualiza el nombre de la empresa
     {
         $user = Auth::user();
 
@@ -61,7 +63,7 @@ class CompanyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Company $company)
+    public function destroy(Company $company) // elimina el nombre de la empresa
     {
         $company->delete();
 

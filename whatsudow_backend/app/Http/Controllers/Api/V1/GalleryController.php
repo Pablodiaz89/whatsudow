@@ -17,7 +17,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class GalleryController extends Controller
 {
-    
+    use HasRoles;
 
     /**
      * Display a listing of the resource.
@@ -26,18 +26,8 @@ class GalleryController extends Controller
     {
         $user = Auth::user();
 
-        // verificación si el usuario tiene el rol "proveedor"
-        if ($user->hasRole('proveedor')) {
-            // obtener las galerías del usuario
-            $galleries = $user->galleries;
-        } else {
-            // obtener las galerías de los usuarios con el rol "proveedor"
-            $galleries = Gallery::whereHas('user', function ($query) {
-                $query->whereHas('roles', function ($query) {
-                    $query->where('name', 'proveedor');
-                });
-            })->get();
-        }
+        // obteneción de las galerías del usuario proveedor actualmente autenticado
+        $galleries = $user->galleries;
 
         return new GalleryCollection($galleries);
     }
@@ -49,6 +39,7 @@ class GalleryController extends Controller
     {
         $user = Auth::user();
 
+        
         // verificación si el usuario tiene el permiso "crear galería"
         if (!$user->can('crear galería')) {
             return response()->json(['message' => 'No tienes permiso para añadir una imagen'], 403);

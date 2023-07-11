@@ -10,21 +10,23 @@ use App\Http\Requests\DescriptionRequest;
 use App\Http\Resources\V1\DescriptionResource;
 use App\Http\Resources\V1\DescriptionCollection;
 
+// este controlador maneja las descripciones del usuario
+
 class DescriptionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index() // obtiene la descripción
     {
-       // obtiene todas las descripciones
-       return new DescriptionCollection(Description::all());
+        // obtiene todas las descripciones
+        return new DescriptionCollection(Description::all());
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(DescriptionRequest $request)
+    public function store(DescriptionRequest $request) // almacena una nueva descripción
     {
         // obtiene el usuario autenticado
         $user = Auth::user();
@@ -42,7 +44,7 @@ class DescriptionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Description $description)
+    public function show(Description $description) // muestra la descripción específica
     {
         // responde con la descripción solicitada
         return new DescriptionResource($description);
@@ -51,7 +53,7 @@ class DescriptionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(DescriptionRequest $request, Description $description)
+    public function update(DescriptionRequest $request, Description $description) // actualiza la descripción existente
     {
         // valida y actualiza la descripción
         $description->description = $request->description;
@@ -64,7 +66,7 @@ class DescriptionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Description $description)
+    public function destroy(Description $description) // elimina la descripción
     {
         // elimina la descripción
         $description->delete();

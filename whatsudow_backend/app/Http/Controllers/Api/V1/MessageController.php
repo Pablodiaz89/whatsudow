@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ReplyToMessageRequest;
 use App\Http\Requests\MarkMessageAsReadRequest;
 
+// este controlador se encarga de manejar las solitudes y almacenaje de los mensajes de texto
+
 class MessageController extends Controller
 {
-                                                     // marcar como leído
-    public function markAsRead(MarkMessageAsReadRequest $request, string $id)
+
+    public function markAsRead(MarkMessageAsReadRequest $request, string $id) // marca el mensaje como leído
     {
         $message = Message::findOrFail($id);
 
@@ -30,7 +32,7 @@ class MessageController extends Controller
     /**
      * Obtener el estado de lectura de un mensaje.
      */
-    public function getReadStatus(string $id)
+    public function getReadStatus(string $id) // obtiene el estado de lectura del mensaje
     {
         $message = Message::findOrFail($id);
 
@@ -42,7 +44,7 @@ class MessageController extends Controller
         return response()->json(['read' => $message->read]);
     }
 
-    public function reply(ReplyToMessageRequest $request, string $id)
+    public function reply(ReplyToMessageRequest $request, string $id) // para que el usuario pueda responder al mensaje
     {
         $message = Message::findOrFail($id);
 
@@ -73,5 +75,4 @@ class MessageController extends Controller
             'data' => $reply,
         ], 201);
     }
-
 }

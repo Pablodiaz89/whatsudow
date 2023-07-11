@@ -7,9 +7,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
+// este controlador maneja el sistema de favoritos
+
 class FavoriteController extends Controller
 {
-    // añadir a favoritos
+    // añade un servicio a la lista de favoritos del usuario 
     public function addFavorite(Request $request)
     {
         $userId = Auth::id();
@@ -35,7 +37,7 @@ class FavoriteController extends Controller
 
 
     // elimina todos los favoritos
-    public function removeAllFavorites()
+    public function removeAllFavorites() // elimina todos los favoritos del usuario
     {
         $userId = Auth::id();
         Favorite::where('user_id', $userId)->delete();
@@ -43,7 +45,7 @@ class FavoriteController extends Controller
         return response()->json(['message' => 'Todos los favoritos fueron eliminados']);
     }
 
-    // elimina un favoritos especificio
+    // elimina un favorito específico del usuario 
     public function removeSingleFavorite($favoriteId)
     {
         $userId = Auth::id();
@@ -54,14 +56,14 @@ class FavoriteController extends Controller
         return response()->json(['message' => 'Favorito eliminado']);
     }
 
-    // ver favoritos
+    // obtiene todos los favoritos del usuario
     public function getFavorites()
     {
         $userId = Auth::id();
         $favorites = Favorite::where('user_id', $userId)
-        ->with('service.user')
-        ->get();
+            ->with('service.user')
+            ->get();
 
-    return response()->json($favorites);
+        return response()->json($favorites);
     }
 }

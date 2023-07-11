@@ -11,13 +11,14 @@ use App\Http\Requests\ServiceResquest;
 use App\Http\Resources\V1\ServiceResource;
 use App\Http\Resources\V1\ServiceCollection;
 
+// este controlador controla los servicios 
 
 class ServiceController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index() // muestra los servicios
     {
         $services = Service::all();
         return new ServiceCollection($services);
@@ -26,7 +27,7 @@ class ServiceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ServiceResquest $request)
+    public function store(ServiceResquest $request) // almacena un nuevo servicio
     {
         $user = Auth::user();
 
@@ -37,13 +38,13 @@ class ServiceController extends Controller
         $service->user_id = $user->id;
         $service->save();
 
-        return new ServiceResource($service); 
+        return new ServiceResource($service);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Service $service)
+    public function show(Service $service) // muestra un servicio específicio
     {
         return new ServiceResource($service);
     }
@@ -51,7 +52,7 @@ class ServiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ServiceResquest $request, Service $service)
+    public function update(ServiceResquest $request, Service $service) // actualiza un servicio específico
     {
         $data = $request->validated();
 
@@ -63,7 +64,7 @@ class ServiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Service $service)
+    public function destroy(Service $service) // elimina un servicio específico
     {
         $service->delete();
 

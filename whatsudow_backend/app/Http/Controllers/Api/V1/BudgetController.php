@@ -15,12 +15,15 @@ use App\Http\Resources\V1\BudgetResource;
 use App\Http\Requests\CreateBudgetRequest;
 use App\Http\Resources\V1\BudgetCollection;
 
+
+// este controlador maneja las solicitudes relacionadas con los presupuestos
+
 class BudgetController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index() // muestra los presupuestos especificos
     {
         $budgets = Budget::all()->map(function ($budget) {
             $budget->event_date = Carbon::parse($budget->event_date)->format('d-m-Y');
@@ -33,7 +36,7 @@ class BudgetController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CreateBudgetRequest $request)
+    public function store(CreateBudgetRequest $request) // almacena un nuevo presupuesto de un usuario concreto
     {
 
         // obtiene los datos del usuario emisor
@@ -78,12 +81,12 @@ class BudgetController extends Controller
             'data' => new BudgetResource($message),
         ], 201);
     }
-    
+
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id) // muestra un presupuesto en concreto
     {
         $message = Message::findOrFail($id);
 
@@ -123,13 +126,12 @@ class BudgetController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id) // elimina un presupuesto específico
     {
         $message = Message::findOrFail($id);
 
@@ -142,9 +144,4 @@ class BudgetController extends Controller
 
         return response()->json(['message' => 'Mensaje eliminado correctamente']);
     }
-
 }
-
-    
-    
-
