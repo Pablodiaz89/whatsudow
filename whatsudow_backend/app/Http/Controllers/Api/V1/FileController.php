@@ -11,14 +11,55 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UploadFileRequest;
 use Illuminate\Support\Facades\Validator;
 
-// este controlador maneja el sistema de almacenamiento de archivos
+/**
+ * @OA\Tag(
+ *     name="Files",
+ *     description="API Endpoints para el sistema de almacenamiento de archivos"
+ * )
+ */
 
 class FileController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index() // devuelve los archivos
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/files",
+     *     summary="Obtener todos los archivos",
+     *     tags={"Files"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Operación exitosa",
+     *         @OA\JsonContent(
+     *             @OA\Schema(
+     *                 @OA\Property(property="data", type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example="1"),
+     *                         @OA\Property(property="filename", type="string", example="example.jpg"),
+     *                         @OA\Property(property="path", type="string", example="/path/to/file.jpg"),
+     *                         @OA\Property(property="type", type="string", example="image/jpeg"),
+     *                         @OA\Property(property="user_id", type="integer", example="123"),
+     *                         @OA\Property(property="gallery_id", type="integer", example="456"),
+     *                         @OA\Property(property="created_at", type="string", format="date-time", example="2023-07-15 12:34:56"),
+     *                         @OA\Property(property="updated_at", type="string", format="date-time", example="2023-07-15 12:34:56")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="No autenticado")
+     *         )
+     *     )
+     * )
+     */
+
+    public function index()
     {
         $files = File::all();
         return FileResource::collection($files);
@@ -27,7 +68,60 @@ class FileController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(UploadFileRequest $request) // almacena un nuevo archivo en el sistema de almacenamiento
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/files",
+     *     summary="Almacenar un nuevo archivo",
+     *     tags={"Files"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Schema(
+     *                 @OA\Property(property="file", type="string", format="binary"),
+     *                 @OA\Property(property="gallery_id", type="integer", example="123")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Operación exitosa",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", example="1"),
+     *             @OA\Property(property="filename", type="string", example="example.jpg"),
+     *             @OA\Property(property="path", type="string", example="/path/to/file.jpg"),
+     *             @OA\Property(property="type", type="string", example="image/jpeg"),
+     *             @OA\Property(property="user_id", type="integer", example="123"),
+     *             @OA\Property(property="gallery_id", type="integer", example="456"),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2023-07-15 12:34:56"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2023-07-15 12:34:56")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="No autenticado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error al guardar el archivo",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="file", type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="file", type="string", example="The file field is required.")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+
+    public function store(UploadFileRequest $request)
     {
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
@@ -63,7 +157,55 @@ class FileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id) // muestra un archivo específico
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/files/{id}",
+     *     summary="Mostrar un archivo específico",
+     *     tags={"Files"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID Archivo",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64",
+     *             example="1"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Operación exitosa",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", example="1"),
+     *             @OA\Property(property="filename", type="string", example="example.jpg"),
+     *             @OA\Property(property="path", type="string", example="/path/to/file.jpg"),
+     *             @OA\Property(property="type", type="string", example="image/jpeg"),
+     *             @OA\Property(property="user_id", type="integer", example="123"),
+     *             @OA\Property(property="gallery_id", type="integer", example="456"),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2023-07-15 12:34:56"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2023-07-15 12:34:56")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="No autenticado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Archivo no encontrado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="File not found.")
+     *         )
+     *     )
+     * )
+     */
+
+    public function show(string $id)
     {
         $file = File::find($id);
 
@@ -77,7 +219,63 @@ class FileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UploadFileRequest $request, string $id) // actualiza el archivo específico 
+
+    /**
+     * @OA\Put(
+     *     path="/api/v1/files/{id}",
+     *     summary="Actualizar un archivo específico",
+     *     tags={"Files"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID Archivo",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64",
+     *             example="1"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Datos de archivo actualizados",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="file", type="string", format="binary"),
+     *             @OA\Property(property="gallery_id", type="integer", example="456")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Operación exitosa",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", example="1"),
+     *             @OA\Property(property="filename", type="string", example="example.jpg"),
+     *             @OA\Property(property="path", type="string", example="/path/to/file.jpg"),
+     *             @OA\Property(property="type", type="string", example="image/jpeg"),
+     *             @OA\Property(property="user_id", type="integer", example="123"),
+     *             @OA\Property(property="gallery_id", type="integer", example="456"),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2023-07-15 12:34:56"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2023-07-15 12:34:56")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="No autenticado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Archivo no encontrado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="File not found.")
+     *         )
+     *     )
+     * )
+     */
+
+    public function update(UploadFileRequest $request, string $id)
     {
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
@@ -120,7 +318,44 @@ class FileController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id) // elimina el archivo existente
+
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/files/{id}",
+     *     summary="Eliminar un archivo",
+     *     tags={"Files"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID Archivo",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Operación exitosa",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Archivo eliminado exitosamente")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="No autenticado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Archivo no encontrado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Archivo no encontrado")
+     *         )
+     *     )
+     * )
+     */
+
+    public function destroy(string $id)
     {
         $file = File::find($id);
 

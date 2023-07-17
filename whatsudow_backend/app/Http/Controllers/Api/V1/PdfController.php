@@ -13,14 +13,29 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\V1\PdfCollection;
 use Illuminate\Support\Facades\Validator;
 
-// este controlador maneja los pdf
+/**
+ * @OA\Tag(
+ *     name="PDFs",
+ *     description="API Endpoints para manejar los archivos pdf"
+ * )
+ */
 
 class PdfController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index() // devuelve los pdfs
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/pdfs",
+     *     summary="Lista de archivos PDF",
+     *     tags={"PDFs"},
+     *     @OA\Response(response="200", description="Éxito"),
+     * )
+     */
+
+    public function index()
     {
         $pdfs = Pdf::all();
 
@@ -30,6 +45,36 @@ class PdfController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/pdfs",
+     *     summary="Actualizar PDF",
+     *     tags={"PDFs"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"file", "session_id"},
+     *                 @OA\Property(
+     *                     property="file",
+     *                     description="Archivo PDF para actualizar",
+     *                     type="file"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="session_id",
+     *                     description="Session ID",
+     *                     type="string"
+     *                 ),
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(response="200", description="PDF subido exitosamente"),
+     *     @OA\Response(response="400", description="El tamaño del archivo excede el límite permitido"),
+     * )
+     */
+
     public function store(PdfRequest $request) // almacena un nuevo pdf en la base de datos a través del controlador FileController que lo almacena
     {
         $validatedData = $request->validated();
@@ -58,7 +103,27 @@ class PdfController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id) // muestra los detalles de un pdf
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/pdfs/{id}",
+     *     summary="Obtener PDF",
+     *     tags={"PDFs"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="PDF ID",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Éxito"),
+     *     @OA\Response(response="404", description="PDF no encontrado"),
+     * )
+     */
+
+    public function show(string $id)
     {
         $pdf = Pdf::find($id);
 
@@ -72,6 +137,46 @@ class PdfController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+    /**
+     * @OA\Put(
+     *     path="/api/v1/pdfs/{id}",
+     *     summary="Actualizar PDF",
+     *     tags={"PDFs"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="PDF ID",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"file", "session_id"},
+     *                 @OA\Property(
+     *                     property="file",
+     *                     description="Archivo PDF actualizado",
+     *                     type="file"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="session_id",
+     *                     description="Session ID",
+     *                     type="string"
+     *                 ),
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(response="200", description="PDF actualizado exitosamente"),
+     *     @OA\Response(response="400", description="El tamaño del archivo excede el límite permitido"),
+     *     @OA\Response(response="404", description="PDF no encontrado"),
+     * )
+     */
+
     public function update(PdfRequest $request, string $id) // actualiza los datos de un pdf y los actualiza en el sistema de almacenamiento a través de FileController
     {
         $validatedData = $request->validated();
@@ -105,7 +210,28 @@ class PdfController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id, FileController $fileController) // elimina un pdf específico
+
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/pdfs/{id}",
+     *     summary="Eliminar PDF",
+     *     tags={"PDFs"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="PDF ID",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="PDF eliminado exitosamente"),
+     *     @OA\Response(response="403", description="No tienes permisos para eliminar este PDF"),
+     *     @OA\Response(response="404", description="PDF no encontrado"),
+     * )
+     */
+
+    public function destroy($id, FileController $fileController)
     {
         $user = Auth::user();
 
@@ -129,6 +255,25 @@ class PdfController extends Controller
 
         return response()->json(['message' => 'PDF eliminado exitosamente']);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/pdfs/{id}/download",
+     *     summary="Descargar PDF",
+     *     tags={"PDFs"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="PDF ID",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Éxito"),
+     *     @OA\Response(response="404", description="PDF no encontrado"),
+     * )
+     */
 
     public function download($id) // descarga un pdf específico
     {

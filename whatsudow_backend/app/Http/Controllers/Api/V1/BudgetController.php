@@ -15,15 +15,45 @@ use App\Http\Resources\V1\BudgetResource;
 use App\Http\Requests\CreateBudgetRequest;
 use App\Http\Resources\V1\BudgetCollection;
 
+/**
+ * @OA\Tag(
+ *     name="Budgets",
+ *     description="Endpoints para las solicitudes relacionadas con los presupuestos"
+ * )
+ */
 
-// este controlador maneja las solicitudes relacionadas con los presupuestos
 
 class BudgetController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @return \App\Http\Resources\V1\BudgetCollection
+     *
+     * @OA\Get(
+     *     path="/budgets",
+     *     operationId="getBudgets",
+     *     tags={"Budgets"},
+     *     summary="Muestra los presupuestos especificos",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Operación exitosa",
+     *         @OA\Schema(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     ref="#/components/schemas/BudgetResource"
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
      */
-    public function index() // muestra los presupuestos especificos
+
+    public function index()
     {
         $budgets = Budget::all()->map(function ($budget) {
             $budget->event_date = Carbon::parse($budget->event_date)->format('d-m-Y');
@@ -35,8 +65,40 @@ class BudgetController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @OA\Post(
+     *     path="/budgets",
+     *     operationId="storeBudget",
+     *     tags={"Budgets"},
+     *     summary="Create a new budget",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Almacena un nuevo presupuesto de un usuario concreto",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="title", type="string"),
+     *             @OA\Property(property="event_date", type="string", format="date"),
+     *             @OA\Property(property="location", type="string"),
+     *             @OA\Property(property="description", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Presupuesto creado correctamente",
+     *         @OA\JsonContent(
+     *             @OA\Schema(
+     *                 @OA\Property(property="message", type="string", example="Mensaje enviado correctamente"),
+     *                 @OA\Property(property="budget", ref="#/components/schemas/BudgetResource")
+     *             )
+     *         )
+     *     )
+     * )
      */
-    public function store(CreateBudgetRequest $request) // almacena un nuevo presupuesto de un usuario concreto
+
+    public function store(CreateBudgetRequest $request)
     {
 
         // obtiene los datos del usuario emisor
@@ -85,14 +147,54 @@ class BudgetController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @param  string  $id
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @OA\Get(
+     *     path="/budgets/{id}",
+     *     operationId="showBudget",
+     *     tags={"Budgets"},
+     *     summary="Obtener detalles de un presupuesto específico",
+     *     @OA\Parameter(
+     *         name="id",
+     *         description="ID de presupuesto",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Operación exitosa",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="budget_title", type="string"),
+     *             @OA\Property(property="sender_name", type="string"),
+     *             @OA\Property(property="received_date", type="string", format="date"),
+     *             @OA\Property(property="status", type="string"),
+     *             @OA\Property(property="sent_date", type="string", format="date"),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="event_date", type="string", format="date"),
+     *                 @OA\Property(property="location", type="string"),
+     *                 @OA\Property(property="description", type="string")
+     *             )
+     *         )
+     *     )
+     * )
      */
-    public function show(string $id) // muestra un presupuesto en concreto
+
+    public function show(string $id)
     {
         $message = Message::findOrFail($id);
 
         // verifica si el usuario autenticado es el remitente o destinatario del mensaje
         if ($message->sender_id !== Auth::id() && $message->addresse_id !== Auth::id()) {
-            return response()->json(['message' => 'No autorizado'], 401);
+            return response()->json(['message' => 'No autenticado'], 401);
         }
 
         // obtiene título de la solicitud de presupuesto
@@ -130,14 +232,41 @@ class BudgetController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @param  string  $id
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @OA\Delete(
+     *     path="/budgets/{id}",
+     *     operationId="destroyBudget",
+     *     tags={"Budgets"},
+     *     summary="Eliminar un presupuesto específico",
+     *     @OA\Parameter(
+     *         name="id",
+     *         description="ID de presupuesto",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Presupuesto eliminado con éxito",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Mensaje eliminado correctamente")
+     *         )
+     *     )
+     * )
      */
+
     public function destroy(string $id) // elimina un presupuesto específico
     {
         $message = Message::findOrFail($id);
 
         // verifica si el usuario autenticado es el remitente del mensaje
         if ($message->sender_id !== Auth::id()) {
-            return response()->json(['message' => 'No autorizado'], 401);
+            return response()->json(['message' => 'No autenticado'], 401);
         }
 
         $message->delete();

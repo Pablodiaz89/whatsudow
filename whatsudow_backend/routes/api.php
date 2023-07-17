@@ -39,7 +39,7 @@ Route::post('/registerprovider', [AuthController::class, 'registerprovider']);
 Route::post('/registerorganizer', [AuthController::class, 'registerorganizer']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']); 
 
 // Versión: 1
 Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
@@ -55,7 +55,6 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
 
     // Rutas de descripciones
     Route::apiResource('/descriptions', DescriptionController::class); 
-
 
     // ruta para documentos de identidad
     Route::apiResource('/documents', 'App\Http\Controllers\Api\V1\DocumentController'); 
@@ -86,7 +85,6 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     Route::delete('/favorites', [FavoriteController::class, 'removeAllFavorites'])->name('favorites.removeAll'); 
     Route::get('/favorites', [FavoriteController::class, 'getFavorites'])->name('favorites.get'); 
 
-
     // Avatar
     Route::get('/avatars/{id}', [AvatarController::class, 'show'])->name('avatars.show');
     Route::post('/avatars/{id}', [AvatarController::class, 'update'])->name('avatars.update');
@@ -104,9 +102,8 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     // Ruta para obtener los eventos de disponibilidad
     Route::get('/availability/events', [AvailabilityController::class, 'getEvents'])->name('availability.getEvents');
 
-
     //Ruta de archivos (almacenamiento)
-    Route::apiResource('/files', FileController::class); // funciona
+    Route::apiResource('/files', FileController::class); 
 
     // Ruta de Galería
     Route::apiResource('/galleries', GalleryController::class);

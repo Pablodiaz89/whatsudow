@@ -9,14 +9,30 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\V1\PhoneResource;
 
-// este controlador es para los teléfonos de los usuarios
+/**
+ * @OA\Tag(
+ *     name="Phones",
+ *     description="API Endpoints para los teléfonos de los usuarios"
+ * )
+ */
+
 
 class PhoneController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index() // muestra los teléfonos
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/phones",
+     *     summary="Obtener lista de teléfonos",
+     *     tags={"Phones"},
+     *     @OA\Response(response="200", description="Éxito")
+     * )
+     */
+
+    public function index()
     {
         $user = auth()->user();
         $phones = $user->phones;
@@ -27,7 +43,27 @@ class PhoneController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(PhoneRequest $request) // almacena un nuevo teléfono en la base de datos
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/phones",
+     *     summary="Guardar teléfono",
+     *     tags={"Phones"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(property="phone", type="string")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Éxito"),
+     *     @OA\Response(response="422", description="Teléfono no válido")
+     * )
+     */
+
+    public function store(PhoneRequest $request)
     {
         $user = auth()->user();
 
@@ -42,7 +78,27 @@ class PhoneController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id) // muestra el teléfono específico de un usuario
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/phones/{id}",
+     *     summary="Obtener teléfono",
+     *     tags={"Phones"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID del teléfono",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Éxito"),
+     *     @OA\Response(response="404", description="No se encontró el teléfono del usuario")
+     * )
+     */
+
+    public function show($id)
     {
         $user = auth()->user();
         $phone = $user->phone;
@@ -57,7 +113,37 @@ class PhoneController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PhoneRequest $request, $id) // actualiza el teléfono específico de un usuario
+
+    /**
+     * @OA\Put(
+     *     path="/api/v1/phones/{id}",
+     *     summary="Actualizar teléfono",
+     *     tags={"Phones"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID del teléfono",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(property="phone", type="string")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Éxito"),
+     *     @OA\Response(response="404", description="No se encontró el teléfono del usuario"),
+     *     @OA\Response(response="422", description="Teléfono no válido")
+     * )
+     */
+
+    public function update(PhoneRequest $request, $id)
     {
         $user = auth()->user();
         $phone = $user->phone;
@@ -75,8 +161,30 @@ class PhoneController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/phones/{id}",
+     *     summary="Eliminar teléfono",
+     *     tags={"Phones"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID del teléfono",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(response="204", description="Teléfono eliminado exitosamente"),
+     *     @OA\Response(response="404", description="Teléfono no encontrado")
+     * )
+     */
     public function destroy(Phone $phone)
     {
-        //
+        $phone->delete();
+
+        return response()->json([
+            'message' => 'Teléfono eliminado exitosamente'
+        ], 204);
     }
 }

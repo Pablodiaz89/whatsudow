@@ -14,19 +14,37 @@ use App\Http\Resources\V1\GalleryCollection;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @OA\Tag(
+ *     name="Galleries",
+ *     description="API Endpoints la subida de archivos de imagenes"
+ * )
+ */
+
 
 class GalleryController extends Controller
 {
     use HasRoles;
 
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/galleries",
+     *     summary="Get all galleries",
+     *     description="Recuperar todos los archivos de imagenes de la galerías",
+     *     tags={"Galleries"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Éxito",
+     *     ),
+     *     security={{"bearerAuth": {}}}
+     * )
      */
+
     public function index()
     {
         $user = Auth::user();
 
-        // obteneción de las galerías del usuario proveedor actualmente autenticado
+        // obteneción de los archivos de imagenes las galerías del usuario proveedor actualmente autenticado
         $galleries = $user->galleries;
 
         return new GalleryCollection($galleries);
@@ -35,12 +53,37 @@ class GalleryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
+    /**
+     * @OA\Post(
+     *     path="/galleries",
+     *     summary="Crear una nueva imagen en la galería",
+     *     description="Crear una nueva imagen en la galería",
+     *     tags={"Galleries"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="images", type="array", @OA\Items(type="string", format="binary"))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Imagen agregada exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     security={{"bearerAuth": {}}}
+     * )
+     */
+
     public function store(GalleryRequest $request)
     {
         $user = Auth::user();
 
-        
-        // verificación si el usuario tiene el permiso "crear galería"
+
+        // verificación si el usuario tiene el permiso "crear galería" (imagen)
         if (!$user->can('crear galería')) {
             return response()->json(['message' => 'No tienes permiso para añadir una imagen'], 403);
         }
@@ -79,6 +122,39 @@ class GalleryController extends Controller
     /**
      * Display the specified resource.
      */
+
+    /**
+     * @OA\Get(
+     *     path="/galleries/{gallery}",
+     *     summary="Obtener imagen en la galería por ID",
+     *     description="Obtener imagen en la galería por ID",
+     *     tags={"Galleries"},
+     *     @OA\Parameter(
+     *         name="gallery",
+     *         in="path",
+     *         description="Gallery ID",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Éxito",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     security={{"bearerAuth": {}}}
+     * )
+     */
+
     public function show(Gallery $gallery)
     {
         $user = Auth::user();
@@ -99,6 +175,45 @@ class GalleryController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+    /**
+     * @OA\Put(
+     *     path="/galleries/{gallery}",
+     *     summary="Actualizar galería",
+     *     description="Actualizar galería",
+     *     tags={"Galleries"},
+     *     @OA\Parameter(
+     *         name="gallery",
+     *         in="path",
+     *         description="Gallery ID",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Imagen actualizada exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     security={{"bearerAuth": {}}}
+     * )
+     */
+
     public function update(GalleryRequest $request, Gallery $gallery)
     {
         $user = Auth::user();
@@ -122,8 +237,66 @@ class GalleryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+
+    /**
+     * @OA\Delete(
+     *     path="/galleries/{gallery}",
+     *     summary="Eliminar una imagen de la galería",
+     *     description="Eliminar una imagen de la galería",
+     *     tags={"Galleries"},
+     *     @OA\Parameter(
+     *         name="gallery",
+     *         in="path",
+     *         description="Gallery ID",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Gallery deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Imagen eliminada exitosamente"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Permiso denegado",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="No tienes permisos para eliminar esta imagen"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No tienes permisos para eliminar esta imagen",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="No tienes permisos para eliminar esta imagen"
+     *             )
+     *         )
+     *     ),
+     *     security={{"bearerAuth": {}}}
+     * )
+     */
+
     public function destroy(Gallery $gallery)
-    {$user = Auth::user();
+    {
+        $user = Auth::user();
 
         // verificación si el usuario tiene el permiso 'eliminar galería' o tiene el rol 'proveedor'
         if (!$user->can('eliminar galería') && !$user->hasRole('proveedor')) {

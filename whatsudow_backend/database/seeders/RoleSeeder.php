@@ -14,6 +14,19 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
+
+        // creación de roles
+        $role1 = Role::create(['name' => 'proveedor']);
+        $role2 = Role::create(['name' => 'organizador']);
+
+        // creación de permisos
+        Permission::create(['name' => 'crear galería'])->assignRole($role1);
+        Permission::create(['name' => 'actualizar galería'])->assignRole($role1);
+        Permission::create(['name' => 'eliminar galería'])->assignRole($role1);
+        Permission::create(['name' => 'ver galería'])->syncRoles([$role1, $role2]);
+
+
+
         /*
         $roles = [
             'proveedor',
@@ -47,21 +60,5 @@ class RoleSeeder extends Seeder
         $role2 = Role::findByName('organizador');
         $role2->givePermissionTo('ver galería');
         */
-
-
-        // creación de roles
-        $role1 = Role::create(['name' => 'proveedor']);
-        $role2 = Role::create(['name' => 'organizador']);
-
-        // creación de permisos
-        Permission::create(['name' => 'crear galería'])->assignRole($role1);
-        Permission::create(['name' => 'actualizar galería'])->assignRole($role1);
-        Permission::create(['name' => 'eliminar galería'])->assignRole($role1);
-        Permission::create(['name' => 'ver galería'])->syncRoles([$role1, $role2]);
-
-        
-        
-
-
     }
 }

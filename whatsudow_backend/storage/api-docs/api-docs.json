@@ -1,0 +1,3579 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Whatsudow",
+        "description": "Aplicación que permite a los organizadores de eventos unificar los datos de sus proveedores de servicios. Con esta app, los organizadores de eventos pueden almacenar y acceder a información importante de los proveedores, comocalendarios de disponibilidad, PDF actualizados, cláusulas y datos de contacto.",
+        "version": "1.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000"
+        }
+    ],
+    "paths": {
+        "/availability/sync-google-calendar": {
+            "get": {
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Sincronizacion con Google Calendar",
+                "description": "Redirige al usuario a la página de autenticación de Google para sincronizar el calendario.",
+                "operationId": "syncGoogleCalendar",
+                "responses": {
+                    "302": {
+                        "description": "Redirigir a la página de autenticación de Google"
+                    }
+                }
+            }
+        },
+        "/availability": {
+            "get": {
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Obtiene las disponibilidades del proveedor",
+                "description": "Recupera las disponibilidades del proveedor.",
+                "operationId": "getAvailabilities",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "user_id": {
+                                                "type": "integer"
+                                            },
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "start_date": {
+                                                "type": "string",
+                                                "format": "date"
+                                            },
+                                            "end_date": {
+                                                "type": "string",
+                                                "format": "date"
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "disponible",
+                                                    "pre-reservado",
+                                                    "no-disponible"
+                                                ]
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Crea una nueva disponibilidad",
+                "description": "Crea una nueva disponibilidad para el proveedor y la almacena en la base de datos. También crea un evento en Google Calendar para esa disponibilidad.",
+                "operationId": "createAvailability",
+                "requestBody": {
+                    "description": "Datos de disponibilidad",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "disponible",
+                                            "pre-reservado",
+                                            "no-disponible"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Disponibilidad creada con éxito"
+                    },
+                    "403": {
+                        "description": "No tienes permiso para realizar esta acción"
+                    }
+                }
+            }
+        },
+        "/availability/{id}": {
+            "get": {
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Obtener la disponibilidad especificada",
+                "description": "Recupera la disponibilidad especificada para el proveedor.",
+                "operationId": "getAvailability",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la disponibilidad",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "user_id": {
+                                            "type": "integer"
+                                        },
+                                        "title": {
+                                            "type": "string"
+                                        },
+                                        "start_date": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "end_date": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "disponible",
+                                                "pre-reservado",
+                                                "no-disponible"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontró la disponibilidad"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Actualizar la disponibilidad especificada",
+                "description": "Actualiza la disponibilidad especificada para el proveedor.",
+                "operationId": "updateAvailability",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la disponibilidad",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Datos de disponibilidad",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "disponible",
+                                            "pre-reservado",
+                                            "no-disponible"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Disponibilidad actualizada con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "user_id": {
+                                            "type": "integer"
+                                        },
+                                        "title": {
+                                            "type": "string"
+                                        },
+                                        "start_date": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "end_date": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "disponible",
+                                                "pre-reservado",
+                                                "no-disponible"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No tienes permiso para realizar esta acción",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontró la disponibilidad",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Elimina la disponibilidad especificada",
+                "description": "Elimina la disponibilidad especificada para el proveedor.",
+                "operationId": "deleteAvailability",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la disponibilidad",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Disponibilidad eliminada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No tienes permiso para realizar esta acción",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontró la disponibilidad",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/availability/events": {
+            "get": {
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Obtener los eventos de disponibilidad",
+                "description": "Recupera los eventos de disponibilidad para los proveedores. Cada evento está codificado por colores según el estado de disponibilidad: verde para disponible, amarillo para reserva previa y rojo para no disponible.",
+                "operationId": "getAvailabilityEvents",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "start": {
+                                                "type": "string",
+                                                "format": "date"
+                                            },
+                                            "end": {
+                                                "type": "string",
+                                                "format": "date"
+                                            },
+                                            "color": {
+                                                "type": "string"
+                                            },
+                                            "proveedor": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No tienes permiso para realizar esta acción",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/avatars": {
+            "get": {
+                "tags": [
+                    "Avatars"
+                ],
+                "summary": "Obtener una lista de avatares",
+                "description": "Display a listing of the resource.",
+                "operationId": "indexAvatars",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/avatars/{id}": {
+            "get": {
+                "tags": [
+                    "Avatars"
+                ],
+                "summary": "Obtener el avatar específico",
+                "description": "Muestra el avatar específico",
+                "operationId": "showAvatar",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the avatar",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "avatar": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "file": {
+                                                    "type": "string",
+                                                    "format": "binary"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Avatar no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Avatars"
+                ],
+                "summary": "Actualiza el avatar de un usuario en concreto. Lo almacena usando el controlador FileController",
+                "description": "Actualizar el avatar específico en el almacenamiento.",
+                "operationId": "updateAvatar",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Avatar ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "description": "El archivo de avatar actualizado",
+                                        "type": "file"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Avatar actualizado con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "El tamaño del archivo supera el límite permitido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/budgets": {
+            "get": {
+                "tags": [
+                    "Budgets"
+                ],
+                "summary": "Muestra los presupuestos especificos",
+                "description": "Display a listing of the resource.",
+                "operationId": "getBudgets",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Budgets"
+                ],
+                "summary": "Create a new budget",
+                "description": "Store a newly created resource in storage.",
+                "operationId": "storeBudget",
+                "requestBody": {
+                    "description": "Almacena un nuevo presupuesto de un usuario concreto",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "event_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "location": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Presupuesto creado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/budgets/{id}": {
+            "get": {
+                "tags": [
+                    "Budgets"
+                ],
+                "summary": "Obtener detalles de un presupuesto específico",
+                "description": "Display the specified resource.",
+                "operationId": "showBudget",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de presupuesto",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "budget_title": {
+                                            "type": "string"
+                                        },
+                                        "sender_name": {
+                                            "type": "string"
+                                        },
+                                        "received_date": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "sent_date": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "message": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "event_date": {
+                                                    "type": "string",
+                                                    "format": "date"
+                                                },
+                                                "location": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Budgets"
+                ],
+                "summary": "Eliminar un presupuesto específico",
+                "description": "Remove the specified resource from storage.",
+                "operationId": "destroyBudget",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de presupuesto",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Presupuesto eliminado con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Mensaje eliminado correctamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/categories": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Obtener una lista de categorías",
+                "description": "Display a listing of the resource.",
+                "operationId": "getCategories",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "icon": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Crea una nueva categoría. Si se proporciona un icono lo asocia a la categoría (es opcional)",
+                "description": "Store a newly created resource in storage.",
+                "operationId": "storeCategory",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "icon": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Categoría creada con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "icon": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/categories/{category}": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Obtener detalles de una categoría específica",
+                "description": "Display the specified resource.",
+                "operationId": "showCategory",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "description": "categoria ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Actualizar los datos de la categoría especifica. Si se asocia un nuevo icono, lo asocia a la categoria.",
+                "description": "Update the specified resource in storage.",
+                "operationId": "updateCategory",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "description": "categoria ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Categoría actualizada con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Eliminar una categoría específica",
+                "description": "Remove the specified resource from storage.",
+                "operationId": "destroyCategory",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "description": "categoria ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Categoría eliminada con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Categoría eliminada con éxito"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/companies": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Obtener todas las empresas",
+                "description": "Display a listing of the resource.",
+                "operationId": "getCompanies",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Almacenar una nueva empresa",
+                "description": "Store a newly created resource in storage.",
+                "operationId": "storeCompany",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Empresa creada con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{company}": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Obtener una empresa específica",
+                "description": "Display the specified resource.",
+                "operationId": "showCompany",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "description": "ID de la compañía",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Actualizar una empresa específica",
+                "description": "Update the specified resource in storage.",
+                "operationId": "updateCompany",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "description": "ID de la compañía",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Datos de la compañia",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Eliminar una empresa específica",
+                "description": "Remove the specified resource from storage.",
+                "operationId": "destroyCompany",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "description": "ID de la compañía",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Empresa eliminada con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/descriptions": {
+            "get": {
+                "tags": [
+                    "Descriptions"
+                ],
+                "summary": "Obtener todas las descripciones",
+                "description": "Display a listing of the resource.",
+                "operationId": "getDescriptions",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Descripción de la muestra"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Descriptions"
+                ],
+                "summary": "Guardar una nueva descripción",
+                "description": "Store a newly created resource in storage.",
+                "operationId": "storeDescription",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Descripción de la muestra"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Descripción creada con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Descripción de la muestra"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/descriptions/{id}": {
+            "get": {
+                "tags": [
+                    "Descriptions"
+                ],
+                "summary": "Obtener una descripción específica",
+                "description": "Display the specified resource.",
+                "operationId": "showDescription",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID descripción",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Descripción de la muestra"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Descriptions"
+                ],
+                "summary": "Actualizar una descripción específica",
+                "description": "Update the specified resource in storage.",
+                "operationId": "updateDescription",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID descripción",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Descripción actualizada"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Description updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Descripción actualizada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Descriptions"
+                ],
+                "summary": "Eliminar una descripción específica",
+                "description": "Remove the specified resource from storage.",
+                "operationId": "deleteDescription",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID descripción",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Descripción eliminada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/documents": {
+            "get": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Obtener todos los documentos",
+                "description": "Display a listing of the resource.",
+                "operationId": "getDocuments",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": "1"
+                                            },
+                                            "user_id": {
+                                                "type": "integer",
+                                                "example": "1"
+                                            },
+                                            "document_indetification": {
+                                                "type": "string",
+                                                "example": "ABC123"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Almacenar un nuevo documento de identidad",
+                "description": "Store a newly created resource in storage.",
+                "operationId": "storeDocument",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "document_indetification": {
+                                        "type": "string",
+                                        "example": "ABC123"
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Documento creado con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": "1"
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": "1"
+                                        },
+                                        "document_indetification": {
+                                            "type": "string",
+                                            "example": "ABC123"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/documents/{id}": {
+            "get": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Obtener un documento específico",
+                "description": "Display the specified resource.",
+                "operationId": "showDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID documento",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": "1"
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": "1"
+                                        },
+                                        "document_indetification": {
+                                            "type": "string",
+                                            "example": "ABC123"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Actualizar un documento específico",
+                "description": "Update the specified resource in storage.",
+                "operationId": "updateDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID documento",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "document_indetification",
+                        "in": "query",
+                        "description": "ID del documento de identidad",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Documento actualizado con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": "1"
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": "1"
+                                        },
+                                        "document_indetification": {
+                                            "type": "string",
+                                            "example": "ABC123"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Eliminar un documento específico",
+                "description": "Remove the specified resource from storage.",
+                "operationId": "deleteDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID documento",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Documento de identidad eliminado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/favorites": {
+            "post": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "Agregar un servicio a favoritos",
+                "description": "Agregar un servicio a la lista de favoritos del usuario.",
+                "operationId": "36857abd42b1f3ebbf94074ea4a79868",
+                "requestBody": {
+                    "description": "ID de servicio",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "service_id": {
+                                        "type": "integer",
+                                        "example": "123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Servicio agregado a favoritos"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autenticado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El servicio ya está en favoritos"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "Eliminar todos los favoritos",
+                "description": "Eliminar todos los favoritos del usuario.",
+                "operationId": "da943ac7e4ea3c65e3e9703d9037d049",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Todos los favoritos fueron eliminados"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autenticado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/favorites/{favoriteId}": {
+            "delete": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "Eliminar un favorito específico",
+                "description": "Eliminar un favorito específico del usuario.",
+                "operationId": "ce6925323e260435e62f4833f4dad785",
+                "parameters": [
+                    {
+                        "name": "favoriteId",
+                        "in": "path",
+                        "description": "ID Favorito",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Favorito eliminado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autenticado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/favorites": {
+            "get": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "Obtener todos los favoritos del usuario",
+                "operationId": "getFavorites",
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        },
+                                        "service_id": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/files": {
+            "get": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Obtener todos los archivos",
+                "operationId": "a0ff886d9b6e0ab2f3f9c0ef60b88bee",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autenticado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Almacenar un nuevo archivo",
+                "operationId": "539c88974a684d121177610c92543c6e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": "1"
+                                        },
+                                        "filename": {
+                                            "type": "string",
+                                            "example": "example.jpg"
+                                        },
+                                        "path": {
+                                            "type": "string",
+                                            "example": "/path/to/file.jpg"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "example": "image/jpeg"
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": "123"
+                                        },
+                                        "gallery_id": {
+                                            "type": "integer",
+                                            "example": "456"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-07-15 12:34:56"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-07-15 12:34:56"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autenticado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error al guardar el archivo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "file": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "file": {
+                                                                "type": "string",
+                                                                "example": "The file field is required."
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/files/{id}": {
+            "get": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Mostrar un archivo específico",
+                "operationId": "9f7471397a0cb53a89fc0441be489f38",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID Archivo",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": "1"
+                                        },
+                                        "filename": {
+                                            "type": "string",
+                                            "example": "example.jpg"
+                                        },
+                                        "path": {
+                                            "type": "string",
+                                            "example": "/path/to/file.jpg"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "example": "image/jpeg"
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": "123"
+                                        },
+                                        "gallery_id": {
+                                            "type": "integer",
+                                            "example": "456"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-07-15 12:34:56"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-07-15 12:34:56"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autenticado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Archivo no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "File not found."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Actualizar un archivo específico",
+                "operationId": "14c357e9c4556d432f07e85af5b4bfc7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID Archivo",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Datos de archivo actualizados",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "gallery_id": {
+                                        "type": "integer",
+                                        "example": "456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": "1"
+                                        },
+                                        "filename": {
+                                            "type": "string",
+                                            "example": "example.jpg"
+                                        },
+                                        "path": {
+                                            "type": "string",
+                                            "example": "/path/to/file.jpg"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "example": "image/jpeg"
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": "123"
+                                        },
+                                        "gallery_id": {
+                                            "type": "integer",
+                                            "example": "456"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-07-15 12:34:56"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-07-15 12:34:56"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autenticado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Archivo no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "File not found."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Eliminar un archivo",
+                "operationId": "2f06304b0d2a4f4f1607449ee16d4a42",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID Archivo",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Archivo eliminado exitosamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autenticado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Archivo no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Archivo no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/galleries": {
+            "get": {
+                "tags": [
+                    "Galleries"
+                ],
+                "summary": "Get all galleries",
+                "description": "Recuperar todos los archivos de imagenes de la galerías",
+                "operationId": "ba03487d733c6470519515c4a55f6d4d",
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Galleries"
+                ],
+                "summary": "Crear una nueva imagen en la galería",
+                "description": "Crear una nueva imagen en la galería",
+                "operationId": "404ec75c0b381df673565dc8129af6c2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "images": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Imagen agregada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/galleries/{gallery}": {
+            "get": {
+                "tags": [
+                    "Galleries"
+                ],
+                "summary": "Obtener imagen en la galería por ID",
+                "description": "Obtener imagen en la galería por ID",
+                "operationId": "1f7b8376229e41b94e0ac3f5db332e23",
+                "parameters": [
+                    {
+                        "name": "gallery",
+                        "in": "path",
+                        "description": "Gallery ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Galleries"
+                ],
+                "summary": "Actualizar galería",
+                "description": "Actualizar galería",
+                "operationId": "eac32088e17fc086e2f5718461152a48",
+                "parameters": [
+                    {
+                        "name": "gallery",
+                        "in": "path",
+                        "description": "Gallery ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Imagen actualizada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Galleries"
+                ],
+                "summary": "Eliminar una imagen de la galería",
+                "description": "Eliminar una imagen de la galería",
+                "operationId": "692ea7ff48225fa65e6d9a3be7d5f31c",
+                "parameters": [
+                    {
+                        "name": "gallery",
+                        "in": "path",
+                        "description": "Gallery ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Gallery deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Imagen eliminada exitosamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permiso denegado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No tienes permisos para eliminar esta imagen"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No tienes permisos para eliminar esta imagen",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No tienes permisos para eliminar esta imagen"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/locations": {
+            "get": {
+                "tags": [
+                    "Locations"
+                ],
+                "summary": "Obtener todas las ubicaciones",
+                "description": "Display a listing of the resource.",
+                "operationId": "49873ce3b7837cc865db7849ec7cccda",
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    }
+                }
+            }
+        },
+        "/api/v1/locations/{id}": {
+            "get": {
+                "tags": [
+                    "Locations"
+                ],
+                "summary": "Obtener una ubicación específica",
+                "description": "Display the specified resource.",
+                "operationId": "297bb90722857403e546b74145806a12",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID Localización",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "404": {
+                        "description": "Ubicación no encontrada"
+                    }
+                }
+            }
+        },
+        "/api/v1/messages/{id}/mark-as-read": {
+            "put": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Marcar un mensaje como leído",
+                "description": "Marcar un mensaje como leído.",
+                "operationId": "ad8b3ea5f3eb979d6eca16432f8b627e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID Mensaje",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "property1": {
+                                        "type": "string",
+                                        "example": "value1"
+                                    },
+                                    "property2": {
+                                        "type": "string",
+                                        "example": "value2"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Mensaje marcado como leído"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            }
+        },
+        "/api/v1/messages/{id}/read-status": {
+            "get": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Obtener el estado de lectura de un mensaje",
+                "description": "Obtener el estado de lectura de un mensaje.",
+                "operationId": "bdc0846c27bd8c5bcb6798b7c231851f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID Mensaje",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            }
+        },
+        "/api/v1/messages/{id}/reply": {
+            "post": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Responder a un mensaje",
+                "description": "Responder a un mensaje.",
+                "operationId": "8e00e5f099e2694cd594be72511638d9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID Mensaje",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "message": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Mensaje enviado correctamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            }
+        },
+        "/api/v1/pdfs": {
+            "get": {
+                "tags": [
+                    "PDFs"
+                ],
+                "summary": "Lista de archivos PDF",
+                "operationId": "8680570fc1a3515e39963c6febffd584",
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "PDFs"
+                ],
+                "summary": "Actualizar PDF",
+                "operationId": "981542793d1983a3dc5a161195aaa54b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file",
+                                    "session_id"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "Archivo PDF para actualizar",
+                                        "type": "file"
+                                    },
+                                    "session_id": {
+                                        "description": "Session ID",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF subido exitosamente"
+                    },
+                    "400": {
+                        "description": "El tamaño del archivo excede el límite permitido"
+                    }
+                }
+            }
+        },
+        "/api/v1/pdfs/{id}": {
+            "get": {
+                "tags": [
+                    "PDFs"
+                ],
+                "summary": "Obtener PDF",
+                "operationId": "7defa51bc29ab3e7e1a916edb0ccb61e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "PDF ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "404": {
+                        "description": "PDF no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "PDFs"
+                ],
+                "summary": "Actualizar PDF",
+                "operationId": "c2007a5f8b3b0fab0c473ab0df807017",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "PDF ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file",
+                                    "session_id"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "Archivo PDF actualizado",
+                                        "type": "file"
+                                    },
+                                    "session_id": {
+                                        "description": "Session ID",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF actualizado exitosamente"
+                    },
+                    "400": {
+                        "description": "El tamaño del archivo excede el límite permitido"
+                    },
+                    "404": {
+                        "description": "PDF no encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "PDFs"
+                ],
+                "summary": "Eliminar PDF",
+                "operationId": "cc94f3f8e7aeb32b48baad5228294029",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "PDF ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "PDF eliminado exitosamente"
+                    },
+                    "403": {
+                        "description": "No tienes permisos para eliminar este PDF"
+                    },
+                    "404": {
+                        "description": "PDF no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/v1/pdfs/{id}/download": {
+            "get": {
+                "tags": [
+                    "PDFs"
+                ],
+                "summary": "Descargar PDF",
+                "operationId": "0b8533969a5430132af49cc52253837c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "PDF ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "404": {
+                        "description": "PDF no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/v1/phones": {
+            "get": {
+                "tags": [
+                    "Phones"
+                ],
+                "summary": "Obtener lista de teléfonos",
+                "operationId": "aaab44c7e8dc61aa1ee1da3f7c557a37",
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Phones"
+                ],
+                "summary": "Guardar teléfono",
+                "operationId": "6385abccf161c54df6e6528cbe011565",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "phone": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "422": {
+                        "description": "Teléfono no válido"
+                    }
+                }
+            }
+        },
+        "/api/v1/phones/{id}": {
+            "get": {
+                "tags": [
+                    "Phones"
+                ],
+                "summary": "Obtener teléfono",
+                "operationId": "5c0a6d0948f2071d9e2ed39420ac7b7e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del teléfono",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "404": {
+                        "description": "No se encontró el teléfono del usuario"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Phones"
+                ],
+                "summary": "Actualizar teléfono",
+                "operationId": "d646866aa7e6f5ce4f2444a7f18e4126",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del teléfono",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "phone": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "404": {
+                        "description": "No se encontró el teléfono del usuario"
+                    },
+                    "422": {
+                        "description": "Teléfono no válido"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Phones"
+                ],
+                "summary": "Eliminar teléfono",
+                "operationId": "e0eae1c2424dbab9e1879ae2b25802c2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del teléfono",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Teléfono eliminado exitosamente"
+                    },
+                    "404": {
+                        "description": "Teléfono no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/v1/services": {
+            "get": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Obtener todos los servicios",
+                "operationId": "19339d2b804c5bbb3a7d51826c6a5e9c",
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Crear un nuevo servicio",
+                "operationId": "b9fd7c793f65af72b2c4e91b4773220a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos de solicitud no válidos"
+                    }
+                }
+            }
+        },
+        "/api/v1/services/{id}": {
+            "get": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Obtener detalles de un servicio",
+                "operationId": "5460efdf46e38dba4e94cc1c62ce15a5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del servicio",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "404": {
+                        "description": "Servicio no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Actualizar un servicio",
+                "operationId": "ca0d914039198efb0d6a0a5242999a96",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del servicio",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Servicio no encontrado"
+                    },
+                    "422": {
+                        "description": "Datos de solicitud no válidos"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Eliminar un servicio",
+                "operationId": "284f2fc04534a4a5d77b970203f4e892",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del servicio",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Servicio eliminado exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Servicio no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/v1/user/{id}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Obtener perfil de usuario",
+                "operationId": "b521360d42c9697443198dc2425bd57c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del usuario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Éxito"
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/v1/user/name/{id}": {
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Actualizar nombre de usuario",
+                "operationId": "6d15b93e86779328628c985c766f73d5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del usuario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Nuevo nombre del usuario",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Nombre actualizado correctamente"
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/v1/user/email/{id}": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Actualizar email de usuario",
+                "operationId": "32a3e7616945fefe166ac665a5b8edf3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del usuario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "Nuevo email del usuario",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Correo electrónico actualizado con éxito"
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/v1/user/password/{id}": {
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Actualizar contraseña de usuario",
+                "operationId": "988067f8ef5254fd8a65be83053337dc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del usuario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "Nueva contraseña del usuario",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "password"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Contraseña actualizada exitosamente"
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    }
+                }
+            }
+        },
+        "/registerprovider": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Registro para proveedores",
+                "operationId": "registerProvider",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuario registrado correctamente"
+                    },
+                    "422": {
+                        "description": "Datos de entrada inválidos"
+                    }
+                }
+            }
+        },
+        "/registerorganizer": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Registro para organizadores",
+                "operationId": "registerOrganizer",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "company": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuario registrado correctamente"
+                    },
+                    "422": {
+                        "description": "Datos de entrada inválidos"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Iniciar sesión",
+                "operationId": "login",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuario logeado correctamente"
+                    },
+                    "422": {
+                        "description": "El email o el password son incorrectos"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "get": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Cerrar sesión",
+                "operationId": "logout",
+                "responses": {
+                    "200": {
+                        "description": "Ha cerrado sesión correctamente"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/forgot-password": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Recuperar contraseña",
+                "operationId": "forgotPassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Se ha enviado un correo electrónico para restablecer la contraseña"
+                    },
+                    "404": {
+                        "description": "No se encontró ningún usuario con esa dirección de correo electrónico"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Availability",
+            "description": "Endpoints para disponibilidad (calendario - sistema de citas)"
+        },
+        {
+            "name": "Avatars",
+            "description": "Endpoints para los avatars o imagenes de perfil"
+        },
+        {
+            "name": "Budgets",
+            "description": "Endpoints para las solicitudes relacionadas con los presupuestos"
+        },
+        {
+            "name": "Categories",
+            "description": "Endpoints para las categorías"
+        },
+        {
+            "name": "Companies",
+            "description": "Endpoints para los nombres de las empresas o compañias empresariales"
+        },
+        {
+            "name": "Descriptions",
+            "description": "Endpoints para las descripciones del usuario"
+        },
+        {
+            "name": "Documents",
+            "description": "Endpoints para documentos de identificación del usuario"
+        },
+        {
+            "name": "Favorites",
+            "description": "API Endpoints para el sistema de favoritos"
+        },
+        {
+            "name": "Files",
+            "description": "API Endpoints para el sistema de almacenamiento de archivos"
+        },
+        {
+            "name": "Galleries",
+            "description": "API Endpoints la subida de archivos de imagenes"
+        },
+        {
+            "name": "Locations",
+            "description": "API Endpoints para localizaciones de ubicación. ... para actualizar o crear si no existe esta relacionada en el controlador BudgetController de presupuesto"
+        },
+        {
+            "name": "Messages",
+            "description": "API Endpoints para manejar las solitudes y almacenaje de los mensajes de texto"
+        },
+        {
+            "name": "PDFs",
+            "description": "API Endpoints para manejar los archivos pdf"
+        },
+        {
+            "name": "Phones",
+            "description": "API Endpoints para los teléfonos de los usuarios"
+        },
+        {
+            "name": "Services",
+            "description": "API Endpoints para los servicios"
+        },
+        {
+            "name": "Users",
+            "description": "API Endpoints para los datos de usuario, como: nombre, email y contraseña"
+        }
+    ]
+}
